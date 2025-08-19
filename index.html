@@ -1,0 +1,2740 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامج الفحوصات المخبرية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #D2B48C; /* Light Brown */
+            --secondary-color: #A52A2A; /* Brown */
+            --accent-color: #87CEEB; /* Sky Blue */
+            --light-green: #C8D5B9; /* Light Greenish Brown */
+            --button-color-1: #4CAF50;
+            --button-color-2: #2196F3;
+            --button-color-3: #FF9800;
+            --button-color-4: #9C27B0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .welcome-screen img {
+            max-width: 300px;
+            max-height: 300px;
+            margin-bottom: 20px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .login-screen img {
+            max-width: 200px;
+            max-height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .login-screen h2 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        .login-screen input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .login-screen button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--button-color-1);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .login-screen button:hover {
+            background-color: #45a049;
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .language-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .language-btn.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-header img {
+            max-width: 80px;
+            max-height: 80px;
+            margin-left: 15px;
+        }
+
+        .dashboard-header h2 {
+            color: var(--secondary-color);
+        }
+
+        .dashboard-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        .dashboard-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .dashboard-btn i {
+            font-size: 20px;
+        }
+
+        .btn-1 { background-color: var(--button-color-1); }
+        .btn-2 { background-color: var(--button-color-2); }
+        .btn-3 { background-color: var(--button-color-3); }
+        .btn-4 { background-color: var(--button-color-4); }
+
+        .dashboard-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-3px);
+        }
+
+        /* Data Entry Screen */
+        .data-entry {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .data-entry-header img {
+            max-width: 80px;
+            max-height: 80px;
+        }
+
+        .data-entry-header h2 {
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .test-number {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .form-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Report Screen */
+        .report-screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .report-header h2 {
+            color: var(--secondary-color);
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .report-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Image Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 100%;
+            border: 3px solid white;
+            border-radius: 5px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        /* Settings Screen */
+        .settings-screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-header {
+            margin-bottom: 20px;
+        }
+
+        .settings-header h2 {
+            color: var(--secondary-color);
+        }
+
+        .settings-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .settings-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .settings-tab.active {
+            border-bottom: 3px solid var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .settings-content {
+            display: none;
+        }
+
+        .settings-content.active {
+            display: block;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+
+        .color-option.selected {
+            border-color: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .dashboard-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .data-entry-header, .report-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .data-entry-header img, .report-header img {
+                align-self: flex-end;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-screen {
+                padding: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .form-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <img id="welcomeImage" src="" alt="Welcome Image">
+            <h2 id="welcomeText">مرحباً بكم في برنامج الفحوصات المخبرية</h2>
+        </div>
+
+        <!-- Login Screen -->
+        <div class="login-screen" id="loginScreen">
+            <img id="loginImage" src="" alt="Login Image">
+            <h2 id="loginTitle">تسجيل الدخول</h2>
+            
+            <div class="language-switcher">
+                <button class="language-btn active" id="arabicBtn">A</button>
+                <button class="language-btn" id="englishBtn">E</button>
+            </div>
+            
+            <input type="text" id="employeeId" placeholder="الرقم الوظيفي">
+            <button id="loginBtn">تسجيل الدخول</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <div class="dashboard-header">
+                <img id="dashboardImage" src="" alt="Dashboard Image">
+                <h2 id="dashboardTitle">مرحباً <span id="usernameDisplay"></span></h2>
+            </div>
+            
+            <div class="dashboard-buttons">
+                <button class="dashboard-btn btn-1" id="dataEntryBtn">
+                    <i class="fas fa-flask"></i>
+                    <span id="dataEntryText">إدخال الاختبارات</span>
+                </button>
+                <button class="dashboard-btn btn-2" id="reportBtn">
+                    <i class="fas fa-file-alt"></i>
+                    <span id="reportText">التقرير</span>
+                </button>
+                <button class="dashboard-btn btn-3" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                    <span id="settingsText">الإعدادات</span>
+                </button>
+                <button class="dashboard-btn btn-4" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span id="logoutText">تسجيل خروج</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Data Entry Screen -->
+        <div class="data-entry" id="dataEntryScreen">
+            <div class="data-entry-header">
+                <h2 id="dataEntryTitle">إدخال الفحوصات المختبرية</h2>
+                <img id="dataEntryImage" src="" alt="Data Entry Image">
+            </div>
+            
+            <div class="form-group">
+                <label id="dateLabel">التاريخ:</label>
+                <input type="date" id="testDate">
+            </div>
+            
+            <div class="form-group">
+                <label id="timeLabel">الوقت:</label>
+                <input type="time" id="testTime">
+            </div>
+            
+            <div class="form-group">
+                <label id="locationLabel">الموقع:</label>
+                <select id="mainLocation">
+                    <option value="">-- اختر الموقع الرئيسي --</option>
+                    <option value="مسالخ">مسالخ</option>
+                    <option value="أسواق مواشي">أسواق مواشي</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label id="subLocationLabel">الموقع الفرعي:</label>
+                <select id="subLocation" disabled>
+                    <option value="">-- اختر الموقع الفرعي --</option>
+                </select>
+            </div>
+            
+            <div class="test-number" id="testNumber">رقم الاختبار: LT-0001</div>
+            
+            <div class="form-section">
+                <h3 id="animalInfoTitle">معلومات الحيوان</h3>
+                
+                <div class="form-group">
+                    <label id="ownerLabel">صاحب الحيوان:</label>
+                    <input type="text" id="ownerName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label id="phoneLabel">رقم التلفون:</label>
+                    <input type="tel" id="phoneNumber">
+                </div>
+                
+                <div class="form-group">
+                    <label id="animalTypeLabel">نوع الحيوان:</label>
+                    <select id="animalType" required>
+                        <option value="">-- اختر نوع الحيوان --</option>
+                        <option value="خروف">خروف</option>
+                        <option value="ماعز">ماعز</option>
+                        <option value="جمال">جمال</option>
+                        <option value="بقر">بقر</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label id="animalGenderLabel">جنس الحيوان:</label>
+                    <select id="animalGender" required>
+                        <option value="">-- اختر الجنس --</option>
+                        <option value="ذكر">ذكر</option>
+                        <option value="انثى">انثى</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 id="testInfoTitle">معلومات الاختبار</h3>
+                
+                <div class="form-group">
+                    <label id="sampleTypeLabel">نوع العينة:</label>
+                    <select id="sampleType" required>
+                        <option value="">-- اختر نوع العينة --</option>
+                        <option value="عينة دم">عينة دم</option>
+                        <option value="شحوم">شحوم</option>
+                        <option value="لحم">لحم</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="otherSampleTypeContainer" style="display: none;">
+                    <label id="otherSampleTypeLabel">حدد نوع العينة:</label>
+                    <input type="text" id="otherSampleType">
+                </div>
+                
+                <div class="form-group">
+                    <label id="testTypeLabel">نوع الاختبار:</label>
+                    <select id="testType" required>
+                        <option value="">-- اختر نوع الاختبار --</option>
+                        <option value="بروسيلا RBT">بروسيلا RBT</option>
+                        <option value="يرقان Juandice">يرقان Juandice</option>
+                        <option value="رائحة Odor">رائحة Odor</option>
+                        <option value="اختبار بقايا المضادات الحيوية Antibiotic residues">اختبار بقايا المضادات الحيوية Antibiotic residues</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="otherTestTypeContainer" style="display: none;">
+                    <label id="otherTestTypeLabel">حدد نوع الاختبار:</label>
+                    <input type="text" id="otherTestType">
+                </div>
+                
+                <div class="form-group">
+                    <label id="resultLabel">نتيجة الاختبار:</label>
+                    <select id="testResult" required>
+                        <option value="">-- اختر النتيجة --</option>
+                        <option value="سلبية -Ve">سلبية -Ve</option>
+                        <option value="إيجابية +VE">إيجابية +VE</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label id="imageLabel">رفع صورة (اختياري):</label>
+                    <input type="file" id="testImage" accept="image/*">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-1" id="addTestBtn">
+                    <i class="fas fa-plus"></i>
+                    <span id="addTestText">إضافة</span>
+                </button>
+                <button class="btn-2" id="viewReportBtn">
+                    <i class="fas fa-file-alt"></i>
+                    <span id="viewReportText">التقرير</span>
+                </button>
+                <button class="btn-4" id="backToDashboardBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span id="backText">رجوع</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Report Screen -->
+        <div class="report-screen" id="reportScreen">
+            <div class="report-header">
+                <h2 id="reportTitle">تقرير الفحوصات المختبرية</h2>
+            </div>
+            
+            <div class="filters">
+                <select id="reportMainLocationFilter">
+                    <option value="">جميع المواقع الرئيسية</option>
+                    <option value="مسالخ">مسالخ</option>
+                    <option value="أسواق مواشي">أسواق مواشي</option>
+                </select>
+                
+                <select id="reportSubLocationFilter" disabled>
+                    <option value="">جميع المواقع الفرعية</option>
+                </select>
+                
+                <input type="date" id="reportDateFilter">
+                
+                <button class="btn-1" id="filterReportBtn">
+                    <i class="fas fa-filter"></i>
+                    <span id="filterText">تصفية</span>
+                </button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table id="reportTable">
+                    <thead>
+                        <tr>
+                            <th id="serialHeader">#</th>
+                            <th id="dateHeader">التاريخ</th>
+                            <th id="sampleNumberHeader">رقم العينة</th>
+                            <th id="mainLocationHeader">الموقع الرئيسي</th>
+                            <th id="subLocationHeader">الموقع الفرعي</th>
+                            <th id="ownerHeader">صاحب الحيوان</th>
+                            <th id="phoneHeader">رقم التلفون</th>
+                            <th id="animalTypeHeader">نوع الحيوان</th>
+                            <th id="animalGenderHeader">جنس الحيوان</th>
+                            <th id="sampleTypeHeader">نوع العينة</th>
+                            <th id="testTypeHeader">نوع الاختبار</th>
+                            <th id="resultHeader">النتيجة</th>
+                            <th id="imageHeader">الصورة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody">
+                        <!-- Data will be inserted here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="report-footer">
+                <div id="userFooter">المدخل: <span id="enteredBy"></span></div>
+                <div id="pageFooter">صفحة 1 من 1</div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-2" id="exportPdfBtn">
+                    <i class="fas fa-file-pdf"></i>
+                    <span id="exportPdfText">تصدير PDF</span>
+                </button>
+                <button class="btn-4" id="backToDashboardFromReportBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span id="backText2">رجوع</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div class="settings-screen" id="settingsScreen">
+            <div class="settings-header">
+                <h2 id="settingsTitle">الإعدادات</h2>
+            </div>
+            
+            <div class="settings-tabs">
+                <div class="settings-tab active" data-tab="users">المستخدمون</div>
+                <div class="settings-tab" data-tab="sampleTypes">أنواع العينات</div>
+                <div class="settings-tab" data-tab="testTypes">أنواع الاختبارات</div>
+                <div class="settings-tab" data-tab="locations">المواقع</div>
+                <div class="settings-tab" data-tab="images">الصور</div>
+                <div class="settings-tab" data-tab="theme">المظهر</div>
+            </div>
+            
+            <!-- Users Tab -->
+            <div class="settings-content active" id="usersTab">
+                <h3 id="usersTitle">إدارة المستخدمين</h3>
+                
+                <div class="form-group">
+                    <label id="newUsernameLabel">اسم المستخدم:</label>
+                    <input type="text" id="newUsername">
+                </div>
+                
+                <div class="form-group">
+                    <label id="newEmployeeIdLabel">الرقم الوظيفي:</label>
+                    <input type="text" id="newEmployeeId">
+                </div>
+                
+                <div class="form-group">
+                    <label id="userMainLocationLabel">الموقع الرئيسي:</label>
+                    <select id="userMainLocation">
+                        <option value="">-- اختر الموقع الرئيسي --</option>
+                        <option value="مسالخ">مسالخ</option>
+                        <option value="أسواق مواشي">أسواق مواشي</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label id="userSubLocationLabel">الموقع الفرعي:</label>
+                    <select id="userSubLocation" disabled>
+                        <option value="">-- اختر الموقع الفرعي --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label id="userRoleLabel">الدور:</label>
+                    <select id="userRole">
+                        <option value="admin">مدير</option>
+                        <option value="user">مستخدم عادي</option>
+                    </select>
+                </div>
+                
+                <button class="btn-1" id="addUserBtn">
+                    <i class="fas fa-user-plus"></i>
+                    <span id="addUserText">إضافة مستخدم</span>
+                </button>
+                
+                <h4 style="margin-top: 20px;" id="usersListTitle">قائمة المستخدمين</h4>
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th id="userNameHeader">اسم المستخدم</th>
+                            <th id="userIdHeader">الرقم الوظيفي</th>
+                            <th id="userLocationHeader">الموقع</th>
+                            <th id="userRoleHeader">الدور</th>
+                            <th id="userActionsHeader">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be listed here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Sample Types Tab -->
+            <div class="settings-content" id="sampleTypesTab">
+                <h3 id="sampleTypesTitle">إدارة أنواع العينات</h3>
+                
+                <div class="form-group">
+                    <label id="newSampleTypeLabel">نوع العينة الجديد:</label>
+                    <input type="text" id="newSampleType">
+                </div>
+                
+                <button class="btn-1" id="addSampleTypeBtn">
+                    <i class="fas fa-plus"></i>
+                    <span id="addSampleTypeText">إضافة</span>
+                </button>
+                
+                <h4 style="margin-top: 20px;" id="sampleTypesListTitle">قائمة أنواع العينات</h4>
+                <table id="sampleTypesTable">
+                    <thead>
+                        <tr>
+                            <th id="sampleTypeNameHeader">نوع العينة</th>
+                            <th id="sampleTypeActionsHeader">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sampleTypesTableBody">
+                        <!-- Sample types will be listed here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Test Types Tab -->
+            <div class="settings-content" id="testTypesTab">
+                <h3 id="testTypesTitle">إدارة أنواع الاختبارات</h3>
+                
+                <div class="form-group">
+                    <label id="newTestTypeLabel">نوع الاختبار الجديد:</label>
+                    <input type="text" id="newTestType">
+                </div>
+                
+                <button class="btn-1" id="addTestTypeBtn">
+                    <i class="fas fa-plus"></i>
+                    <span id="addTestTypeText">إضافة</span>
+                </button>
+                
+                <h4 style="margin-top: 20px;" id="testTypesListTitle">قائمة أنواع الاختبارات</h4>
+                <table id="testTypesTable">
+                    <thead>
+                        <tr>
+                            <th id="testTypeNameHeader">نوع الاختبار</th>
+                            <th id="testTypeActionsHeader">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="testTypesTableBody">
+                        <!-- Test types will be listed here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Locations Tab -->
+            <div class="settings-content" id="locationsTab">
+                <h3 id="locationsTitle">إدارة المواقع</h3>
+                
+                <div class="form-group">
+                    <label id="newMainLocationLabel">الموقع الرئيسي الجديد:</label>
+                    <input type="text" id="newMainLocation">
+                </div>
+                
+                <button class="btn-1" id="addMainLocationBtn">
+                    <i class="fas fa-plus"></i>
+                    <span id="addMainLocationText">إضافة</span>
+                </button>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label id="mainLocationForSubLabel">الموقع الرئيسي:</label>
+                    <select id="mainLocationForSub">
+                        <option value="">-- اختر الموقع الرئيسي --</option>
+                        <option value="مسالخ">مسالخ</option>
+                        <option value="أسواق مواشي">أسواق مواشي</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label id="newSubLocationLabel">الموقع الفرعي الجديد:</label>
+                    <input type="text" id="newSubLocation">
+                </div>
+                
+                <button class="btn-1" id="addSubLocationBtn">
+                    <i class="fas fa-plus"></i>
+                    <span id="addSubLocationText">إضافة</span>
+                </button>
+                
+                <h4 style="margin-top: 20px;" id="locationsListTitle">قائمة المواقع</h4>
+                <table id="locationsTable">
+                    <thead>
+                        <tr>
+                            <th id="mainLocationHeaderSettings">الموقع الرئيسي</th>
+                            <th id="subLocationsHeader">المواقع الفرعية</th>
+                            <th id="locationActionsHeader">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="locationsTableBody">
+                        <!-- Locations will be listed here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Images Tab -->
+            <div class="settings-content" id="imagesTab">
+                <h3 id="imagesTitle">إدارة الصور</h3>
+                
+                <div class="form-group">
+                    <label id="imageTypeLabel">نوع الصورة:</label>
+                    <select id="imageType">
+                        <option value="welcome">شاشة الترحيب</option>
+                        <option value="login">شاشة تسجيل الدخول</option>
+                        <option value="dashboard">لوحة التحكم</option>
+                        <option value="dataEntry">شاشة إدخال البيانات</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label id="uploadImageLabel">رفع الصورة:</label>
+                    <input type="file" id="uploadImage" accept="image/*">
+                </div>
+                
+                <button class="btn-1" id="saveImageBtn">
+                    <i class="fas fa-save"></i>
+                    <span id="saveImageText">حفظ الصورة</span>
+                </button>
+                
+                <div style="margin-top: 20px;">
+                    <h4 id="currentImagesTitle">الصور الحالية</h4>
+                    <div id="currentImagesPreview">
+                        <!-- Image previews will be shown here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Theme Tab -->
+            <div class="settings-content" id="themeTab">
+                <h3 id="themeTitle">إعدادات المظهر</h3>
+                
+                <div class="form-group">
+                    <label id="themeColorLabel">لون البرنامج:</label>
+                    <div class="color-options">
+                        <div class="color-option selected" style="background-color: #D2B48C;" data-color="light-brown"></div>
+                        <div class="color-option" style="background-color: #A52A2A;" data-color="brown"></div>
+                        <div class="color-option" style="background-color: #87CEEB;" data-color="sky-blue"></div>
+                        <div class="color-option" style="background-color: #C8D5B9;" data-color="light-green"></div>
+                    </div>
+                </div>
+                
+                <button class="btn-1" id="saveThemeBtn">
+                    <i class="fas fa-save"></i>
+                    <span id="saveThemeText">حفظ الإعدادات</span>
+                </button>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-4" id="backToDashboardFromSettingsBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span id="backText3">رجوع</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Image Modal -->
+        <div class="image-modal" id="imageModal">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <div class="image-modal-content">
+                <img id="modalImage" src="" alt="Enlarged Image">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentLanguage = 'arabic';
+        let currentUser = null;
+        let tests = [];
+        let testCounter = 1;
+        let users = [
+            { username: 'مصعب بشير', employeeId: '70062', mainLocation: '', subLocation: '', role: 'admin' }
+        ];
+        let sampleTypes = ['عينة دم', 'شحوم', 'لحم', 'أخرى'];
+        let testTypes = ['بروسيلا RBT', 'يرقان Juandice', 'رائحة Odor', 'اختبار بقايا المضادات الحيوية Antibiotic residues', 'أخرى'];
+        let locations = {
+            'مسالخ': ['مسلخ مدينة زايد', 'مسلخ المنطقة الشرقية'],
+            'أسواق مواشي': ['سوق المواشي المركزي', 'سوق المواشي الغربي']
+        };
+        let images = {
+            welcome: null,
+            login: null,
+            dashboard: null,
+            dataEntry: null
+        };
+        let theme = 'light-brown';
+
+        // Language translations
+        const translations = {
+            arabic: {
+                welcomeText: 'مرحباً بكم في برنامج الفحوصات المخبرية',
+                loginTitle: 'تسجيل الدخول',
+                employeeIdPlaceholder: 'الرقم الوظيفي',
+                loginBtn: 'تسجيل الدخول',
+                dashboardTitle: 'مرحباً',
+                dataEntryText: 'إدخال الاختبارات',
+                reportText: 'التقرير',
+                settingsText: 'الإعدادات',
+                logoutText: 'تسجيل خروج',
+                dataEntryTitle: 'إدخال الفحوصات المختبرية',
+                dateLabel: 'التاريخ:',
+                timeLabel: 'الوقت:',
+                locationLabel: 'الموقع:',
+                subLocationLabel: 'الموقع الفرعي:',
+                animalInfoTitle: 'معلومات الحيوان',
+                ownerLabel: 'صاحب الحيوان:',
+                phoneLabel: 'رقم التلفون:',
+                animalTypeLabel: 'نوع الحيوان:',
+                animalGenderLabel: 'جنس الحيوان:',
+                testInfoTitle: 'معلومات الاختبار',
+                sampleTypeLabel: 'نوع العينة:',
+                otherSampleTypeLabel: 'حدد نوع العينة:',
+                testTypeLabel: 'نوع الاختبار:',
+                otherTestTypeLabel: 'حدد نوع الاختبار:',
+                resultLabel: 'نتيجة الاختبار:',
+                imageLabel: 'رفع صورة (اختياري):',
+                addTestText: 'إضافة',
+                viewReportText: 'التقرير',
+                backText: 'رجوع',
+                reportTitle: 'تقرير الفحوصات المختبرية',
+                filterText: 'تصفية',
+                serialHeader: '#',
+                dateHeader: 'التاريخ',
+                sampleNumberHeader: 'رقم العينة',
+                mainLocationHeader: 'الموقع الرئيسي',
+                subLocationHeader: 'الموقع الفرعي',
+                ownerHeader: 'صاحب الحيوان',
+                phoneHeader: 'رقم التلفون',
+                animalTypeHeader: 'نوع الحيوان',
+                animalGenderHeader: 'جنس الحيوان',
+                sampleTypeHeader: 'نوع العينة',
+                testTypeHeader: 'نوع الاختبار',
+                resultHeader: 'النتيجة',
+                imageHeader: 'الصورة',
+                exportPdfText: 'تصدير PDF',
+                backText2: 'رجوع',
+                settingsTitle: 'الإعدادات',
+                usersTitle: 'إدارة المستخدمين',
+                newUsernameLabel: 'اسم المستخدم:',
+                newEmployeeIdLabel: 'الرقم الوظيفي:',
+                userMainLocationLabel: 'الموقع الرئيسي:',
+                userSubLocationLabel: 'الموقع الفرعي:',
+                userRoleLabel: 'الدور:',
+                addUserText: 'إضافة مستخدم',
+                usersListTitle: 'قائمة المستخدمين',
+                userNameHeader: 'اسم المستخدم',
+                userIdHeader: 'الرقم الوظيفي',
+                userLocationHeader: 'الموقع',
+                userRoleHeader: 'الدور',
+                userActionsHeader: 'إجراءات',
+                sampleTypesTitle: 'إدارة أنواع العينات',
+                newSampleTypeLabel: 'نوع العينة الجديد:',
+                addSampleTypeText: 'إضافة',
+                sampleTypesListTitle: 'قائمة أنواع العينات',
+                sampleTypeNameHeader: 'نوع العينة',
+                sampleTypeActionsHeader: 'إجراءات',
+                testTypesTitle: 'إدارة أنواع الاختبارات',
+                newTestTypeLabel: 'نوع الاختبار الجديد:',
+                addTestTypeText: 'إضافة',
+                testTypesListTitle: 'قائمة أنواع الاختبارات',
+                testTypeNameHeader: 'نوع الاختبار',
+                testTypeActionsHeader: 'إجراءات',
+                locationsTitle: 'إدارة المواقع',
+                newMainLocationLabel: 'الموقع الرئيسي الجديد:',
+                addMainLocationText: 'إضافة',
+                mainLocationForSubLabel: 'الموقع الرئيسي:',
+                newSubLocationLabel: 'الموقع الفرعي الجديد:',
+                addSubLocationText: 'إضافة',
+                locationsListTitle: 'قائمة المواقع',
+                mainLocationHeaderSettings: 'الموقع الرئيسي',
+                subLocationsHeader: 'المواقع الفرعية',
+                locationActionsHeader: 'إجراءات',
+                imagesTitle: 'إدارة الصور',
+                imageTypeLabel: 'نوع الصورة:',
+                uploadImageLabel: 'رفع الصورة:',
+                saveImageText: 'حفظ الصورة',
+                currentImagesTitle: 'الصور الحالية',
+                themeTitle: 'إعدادات المظهر',
+                themeColorLabel: 'لون البرنامج:',
+                saveThemeText: 'حفظ الإعدادات',
+                backText3: 'رجوع',
+                deleteText: 'حذف',
+                editText: 'تعديل',
+                chooseMainLocation: '-- اختر الموقع الرئيسي --',
+                chooseSubLocation: '-- اختر الموقع الفرعي --',
+                chooseAnimalType: '-- اختر نوع الحيوان --',
+                chooseGender: '-- اختر الجنس --',
+                chooseSampleType: '-- اختر نوع العينة --',
+                chooseTestType: '-- اختر نوع الاختبار --',
+                chooseResult: '-- اختر النتيجة --',
+                allMainLocations: 'جميع المواقع الرئيسية',
+                allSubLocations: 'جميع المواقع الفرعية',
+                welcomeImage: 'صورة الترحيب',
+                loginImage: 'صورة تسجيل الدخول',
+                dashboardImage: 'صورة لوحة التحكم',
+                dataEntryImage: 'صورة إدخال البيانات',
+                adminRole: 'مدير',
+                userRole: 'مستخدم عادي',
+                sheep: 'خروف',
+                goat: 'ماعز',
+                camel: 'جمال',
+                cow: 'بقر',
+                male: 'ذكر',
+                female: 'انثى',
+                bloodSample: 'عينة دم',
+                fatSample: 'شحوم',
+                meatSample: 'لحم',
+                otherSample: 'أخرى',
+                brucellaTest: 'بروسيلا RBT',
+                jaundiceTest: 'يرقان Juandice',
+                odorTest: 'رائحة Odor',
+                antibioticTest: 'اختبار بقايا المضادات الحيوية Antibiotic residues',
+                otherTest: 'أخرى',
+                negativeResult: 'سلبية -Ve',
+                positiveResult: 'إيجابية +VE'
+            },
+            english: {
+                welcomeText: 'Welcome to Laboratory Tests Program',
+                loginTitle: 'Login',
+                employeeIdPlaceholder: 'Employee ID',
+                loginBtn: 'Login',
+                dashboardTitle: 'Welcome',
+                dataEntryText: 'Enter Tests',
+                reportText: 'Report',
+                settingsText: 'Settings',
+                logoutText: 'Logout',
+                dataEntryTitle: 'Laboratory Tests Data Entry',
+                dateLabel: 'Date:',
+                timeLabel: 'Time:',
+                locationLabel: 'Location:',
+                subLocationLabel: 'Sub Location:',
+                animalInfoTitle: 'Animal Information',
+                ownerLabel: 'Animal Owner:',
+                phoneLabel: 'Phone Number:',
+                animalTypeLabel: 'Animal Type:',
+                animalGenderLabel: 'Animal Gender:',
+                testInfoTitle: 'Test Information',
+                sampleTypeLabel: 'Sample Type:',
+                otherSampleTypeLabel: 'Specify Sample Type:',
+                testTypeLabel: 'Test Type:',
+                otherTestTypeLabel: 'Specify Test Type:',
+                resultLabel: 'Test Result:',
+                imageLabel: 'Upload Image (Optional):',
+                addTestText: 'Add',
+                viewReportText: 'Report',
+                backText: 'Back',
+                reportTitle: 'Laboratory Tests Report',
+                filterText: 'Filter',
+                serialHeader: '#',
+                dateHeader: 'Date',
+                sampleNumberHeader: 'Sample No.',
+                mainLocationHeader: 'Main Location',
+                subLocationHeader: 'Sub Location',
+                ownerHeader: 'Owner',
+                phoneHeader: 'Phone',
+                animalTypeHeader: 'Animal Type',
+                animalGenderHeader: 'Animal Gender',
+                sampleTypeHeader: 'Sample Type',
+                testTypeHeader: 'Test Type',
+                resultHeader: 'Result',
+                imageHeader: 'Image',
+                exportPdfText: 'Export PDF',
+                backText2: 'Back',
+                settingsTitle: 'Settings',
+                usersTitle: 'Users Management',
+                newUsernameLabel: 'Username:',
+                newEmployeeIdLabel: 'Employee ID:',
+                userMainLocationLabel: 'Main Location:',
+                userSubLocationLabel: 'Sub Location:',
+                userRoleLabel: 'Role:',
+                addUserText: 'Add User',
+                usersListTitle: 'Users List',
+                userNameHeader: 'Username',
+                userIdHeader: 'Employee ID',
+                userLocationHeader: 'Location',
+                userRoleHeader: 'Role',
+                userActionsHeader: 'Actions',
+                sampleTypesTitle: 'Sample Types Management',
+                newSampleTypeLabel: 'New Sample Type:',
+                addSampleTypeText: 'Add',
+                sampleTypesListTitle: 'Sample Types List',
+                sampleTypeNameHeader: 'Sample Type',
+                sampleTypeActionsHeader: 'Actions',
+                testTypesTitle: 'Test Types Management',
+                newTestTypeLabel: 'New Test Type:',
+                addTestTypeText: 'Add',
+                testTypesListTitle: 'Test Types List',
+                testTypeNameHeader: 'Test Type',
+                testTypeActionsHeader: 'Actions',
+                locationsTitle: 'Locations Management',
+                newMainLocationLabel: 'New Main Location:',
+                addMainLocationText: 'Add',
+                mainLocationForSubLabel: 'Main Location:',
+                newSubLocationLabel: 'New Sub Location:',
+                addSubLocationText: 'Add',
+                locationsListTitle: 'Locations List',
+                mainLocationHeaderSettings: 'Main Location',
+                subLocationsHeader: 'Sub Locations',
+                locationActionsHeader: 'Actions',
+                imagesTitle: 'Images Management',
+                imageTypeLabel: 'Image Type:',
+                uploadImageLabel: 'Upload Image:',
+                saveImageText: 'Save Image',
+                currentImagesTitle: 'Current Images',
+                themeTitle: 'Appearance Settings',
+                themeColorLabel: 'App Color:',
+                saveThemeText: 'Save Settings',
+                backText3: 'Back',
+                deleteText: 'Delete',
+                editText: 'Edit',
+                chooseMainLocation: '-- Select Main Location --',
+                chooseSubLocation: '-- Select Sub Location --',
+                chooseAnimalType: '-- Select Animal Type --',
+                chooseGender: '-- Select Gender --',
+                chooseSampleType: '-- Select Sample Type --',
+                chooseTestType: '-- Select Test Type --',
+                chooseResult: '-- Select Result --',
+                allMainLocations: 'All Main Locations',
+                allSubLocations: 'All Sub Locations',
+                welcomeImage: 'Welcome Image',
+                loginImage: 'Login Image',
+                dashboardImage: 'Dashboard Image',
+                dataEntryImage: 'Data Entry Image',
+                adminRole: 'Admin',
+                userRole: 'User',
+                sheep: 'Sheep',
+                goat: 'Goat',
+                camel: 'Camel',
+                cow: 'Cow',
+                male: 'Male',
+                female: 'Female',
+                bloodSample: 'Blood Sample',
+                fatSample: 'Fat',
+                meatSample: 'Meat',
+                otherSample: 'Other',
+                brucellaTest: 'Brucella RBT',
+                jaundiceTest: 'Jaundice',
+                odorTest: 'Odor',
+                antibioticTest: 'Antibiotic residues',
+                otherTest: 'Other',
+                negativeResult: 'Negative -Ve',
+                positiveResult: 'Positive +VE'
+            }
+        };
+
+        // Messages for alerts and notifications
+        const messages = {
+            arabic: {
+                loginError: 'الرقم الوظيفي غير صحيح',
+                loginSuccess: 'تم تسجيل الدخول بنجاح',
+                testAdded: 'تم إضافة الاختبار بنجاح',
+                requiredFields: 'يرجى ملء جميع الحقول المطلوبة',
+                settingsAccessDenied: 'غير مصرح لك بالوصول إلى الإعدادات',
+                confirmDelete: 'هل أنت متأكد من أنك تريد الحذف؟',
+                userAdded: 'تم إضافة المستخدم بنجاح',
+                userExists: 'الرقم الوظيفي موجود مسبقاً',
+                sampleTypeAdded: 'تم إضافة نوع العينة بنجاح',
+                sampleTypeExists: 'نوع العينة موجود مسبقاً',
+                testTypeAdded: 'تم إضافة نوع الاختبار بنجاح',
+                testTypeExists: 'نوع الاختبار موجود مسبقاً',
+                locationAdded: 'تم إضافة الموقع بنجاح',
+                locationExists: 'الموقع موجود مسبقاً',
+                imageSaved: 'تم حفظ الصورة بنجاح',
+                themeSaved: 'تم حفظ إعدادات المظهر بنجاح'
+            },
+            english: {
+                loginError: 'Invalid employee ID',
+                loginSuccess: 'Logged in successfully',
+                testAdded: 'Test added successfully',
+                requiredFields: 'Please fill all required fields',
+                settingsAccessDenied: 'You are not authorized to access settings',
+                confirmDelete: 'Are you sure you want to delete?',
+                userAdded: 'User added successfully',
+                userExists: 'Employee ID already exists',
+                sampleTypeAdded: 'Sample type added successfully',
+                sampleTypeExists: 'Sample type already exists',
+                testTypeAdded: 'Test type added successfully',
+                testTypeExists: 'Test type already exists',
+                locationAdded: 'Location added successfully',
+                locationExists: 'Location already exists',
+                imageSaved: 'Image saved successfully',
+                themeSaved: 'Theme settings saved successfully'
+            }
+        };
+
+        // DOM Elements
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboard = document.getElementById('dashboard');
+        const dataEntryScreen = document.getElementById('dataEntryScreen');
+        const reportScreen = document.getElementById('reportScreen');
+        const settingsScreen = document.getElementById('settingsScreen');
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+
+        // Language switcher
+        const arabicBtn = document.getElementById('arabicBtn');
+        const englishBtn = document.getElementById('englishBtn');
+
+        // Login elements
+        const employeeIdInput = document.getElementById('employeeId');
+        const loginBtn = document.getElementById('loginBtn');
+
+        // Dashboard elements
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const dataEntryBtn = document.getElementById('dataEntryBtn');
+        const reportBtn = document.getElementById('reportBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Data entry elements
+        const testDateInput = document.getElementById('testDate');
+        const testTimeInput = document.getElementById('testTime');
+        const mainLocationSelect = document.getElementById('mainLocation');
+        const subLocationSelect = document.getElementById('subLocation');
+        const testNumberDisplay = document.getElementById('testNumber');
+        const ownerNameInput = document.getElementById('ownerName');
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const animalTypeSelect = document.getElementById('animalType');
+        const animalGenderSelect = document.getElementById('animalGender');
+        const sampleTypeSelect = document.getElementById('sampleType');
+        const otherSampleTypeContainer = document.getElementById('otherSampleTypeContainer');
+        const otherSampleTypeInput = document.getElementById('otherSampleType');
+        const testTypeSelect = document.getElementById('testType');
+        const otherTestTypeContainer = document.getElementById('otherTestTypeContainer');
+        const otherTestTypeInput = document.getElementById('otherTestType');
+        const testResultSelect = document.getElementById('testResult');
+        const testImageInput = document.getElementById('testImage');
+        const addTestBtn = document.getElementById('addTestBtn');
+        const viewReportBtn = document.getElementById('viewReportBtn');
+        const backToDashboardBtn = document.getElementById('backToDashboardBtn');
+
+        // Report elements
+        const reportMainLocationFilter = document.getElementById('reportMainLocationFilter');
+        const reportSubLocationFilter = document.getElementById('reportSubLocationFilter');
+        const reportDateFilter = document.getElementById('reportDateFilter');
+        const filterReportBtn = document.getElementById('filterReportBtn');
+        const reportTableBody = document.getElementById('reportTableBody');
+        const enteredByDisplay = document.getElementById('enteredBy');
+        const exportPdfBtn = document.getElementById('exportPdfBtn');
+        const backToDashboardFromReportBtn = document.getElementById('backToDashboardFromReportBtn');
+
+        // Settings elements
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const settingsContents = document.querySelectorAll('.settings-content');
+        const newUsernameInput = document.getElementById('newUsername');
+        const newEmployeeIdInput = document.getElementById('newEmployeeId');
+        const userMainLocationSelect = document.getElementById('userMainLocation');
+        const userSubLocationSelect = document.getElementById('userSubLocation');
+        const userRoleSelect = document.getElementById('userRole');
+        const addUserBtn = document.getElementById('addUserBtn');
+        const usersTableBody = document.getElementById('usersTableBody');
+        const newSampleTypeInput = document.getElementById('newSampleType');
+        const addSampleTypeBtn = document.getElementById('addSampleTypeBtn');
+        const sampleTypesTableBody = document.getElementById('sampleTypesTableBody');
+        const newTestTypeInput = document.getElementById('newTestType');
+        const addTestTypeBtn = document.getElementById('addTestTypeBtn');
+        const testTypesTableBody = document.getElementById('testTypesTableBody');
+        const newMainLocationInput = document.getElementById('newMainLocation');
+        const addMainLocationBtn = document.getElementById('addMainLocationBtn');
+        const mainLocationForSubSelect = document.getElementById('mainLocationForSub');
+        const newSubLocationInput = document.getElementById('newSubLocation');
+        const addSubLocationBtn = document.getElementById('addSubLocationBtn');
+        const locationsTableBody = document.getElementById('locationsTableBody');
+        const imageTypeSelect = document.getElementById('imageType');
+        const uploadImageInput = document.getElementById('uploadImage');
+        const saveImageBtn = document.getElementById('saveImageBtn');
+        const currentImagesPreview = document.getElementById('currentImagesPreview');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const saveThemeBtn = document.getElementById('saveThemeBtn');
+        const backToDashboardFromSettingsBtn = document.getElementById('backToDashboardFromSettingsBtn');
+
+        // Initialize the application
+        function initApp() {
+            // Set current date and time
+            const now = new Date();
+            testDateInput.valueAsDate = now;
+            testTimeInput.value = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            // Generate test number
+            updateTestNumber();
+            
+            // Load data from localStorage
+            loadData();
+            
+            // Show welcome screen first
+            showScreen('welcome');
+            
+            // After 500ms, show login screen
+            setTimeout(() => {
+                showScreen('login');
+            }, 500);
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Update UI with current language
+            updateLanguageUI();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Language switcher
+            arabicBtn.addEventListener('click', () => switchLanguage('arabic'));
+            englishBtn.addEventListener('click', () => switchLanguage('english'));
+            
+            // Login
+            loginBtn.addEventListener('click', handleLogin);
+            
+            // Dashboard buttons
+            dataEntryBtn.addEventListener('click', () => showScreen('dataEntry'));
+            reportBtn.addEventListener('click', () => {
+                showScreen('report');
+                generateReport();
+            });
+            settingsBtn.addEventListener('click', () => {
+                if (currentUser && currentUser.employeeId === '70062') {
+                    showScreen('settings');
+                    showSettingsTab('users');
+                } else {
+                    alert(messages[currentLanguage].settingsAccessDenied);
+                }
+            });
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Data entry
+            mainLocationSelect.addEventListener('change', updateSubLocations);
+            sampleTypeSelect.addEventListener('change', (e) => {
+                otherSampleTypeContainer.style.display = e.target.value === translations[currentLanguage].otherSample ? 'block' : 'none';
+            });
+            testTypeSelect.addEventListener('change', (e) => {
+                otherTestTypeContainer.style.display = e.target.value === translations[currentLanguage].otherTest ? 'block' : 'none';
+            });
+            addTestBtn.addEventListener('click', addTest);
+            viewReportBtn.addEventListener('click', () => {
+                showScreen('report');
+                generateReport();
+            });
+            backToDashboardBtn.addEventListener('click', () => showScreen('dashboard'));
+            
+            // Report
+            reportMainLocationFilter.addEventListener('change', updateReportSubLocationsFilter);
+            filterReportBtn.addEventListener('click', generateReport);
+            exportPdfBtn.addEventListener('click', exportToPdf);
+            backToDashboardFromReportBtn.addEventListener('click', () => showScreen('dashboard'));
+            
+            // Settings tabs
+            settingsTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    showSettingsTab(tab.dataset.tab);
+                });
+            });
+            
+            // Users management
+            userMainLocationSelect.addEventListener('change', updateUserSubLocations);
+            addUserBtn.addEventListener('click', addUser);
+            
+            // Sample types management
+            addSampleTypeBtn.addEventListener('click', addSampleType);
+            
+            // Test types management
+            addTestTypeBtn.addEventListener('click', addTestType);
+            
+            // Locations management
+            addMainLocationBtn.addEventListener('click', addMainLocation);
+            mainLocationForSubSelect.addEventListener('change', () => {
+                newSubLocationInput.disabled = !mainLocationForSubSelect.value;
+            });
+            addSubLocationBtn.addEventListener('click', addSubLocation);
+            
+            // Images management
+            saveImageBtn.addEventListener('click', saveImage);
+            
+            // Theme management
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelector('.color-option.selected').classList.remove('selected');
+                    option.classList.add('selected');
+                    theme = option.dataset.color;
+                });
+            });
+            saveThemeBtn.addEventListener('click', saveTheme);
+            
+            // Back buttons
+            backToDashboardFromSettingsBtn.addEventListener('click', () => showScreen('dashboard'));
+            
+            // Image modal
+            closeModal.addEventListener('click', () => {
+                imageModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside the image
+            imageModal.addEventListener('click', (e) => {
+                if (e.target === imageModal) {
+                    imageModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Show specific screen
+        function showScreen(screen) {
+            welcomeScreen.style.display = 'none';
+            loginScreen.style.display = 'none';
+            dashboard.style.display = 'none';
+            dataEntryScreen.style.display = 'none';
+            reportScreen.style.display = 'none';
+            settingsScreen.style.display = 'none';
+            
+            switch (screen) {
+                case 'welcome':
+                    welcomeScreen.style.display = 'flex';
+                    break;
+                case 'login':
+                    loginScreen.style.display = 'flex';
+                    break;
+                case 'dashboard':
+                    dashboard.style.display = 'flex';
+                    usernameDisplay.textContent = currentUser ? currentUser.username : '';
+                    // Hide settings button for non-admin users
+                    settingsBtn.style.display = currentUser && currentUser.employeeId === '70062' ? 'flex' : 'none';
+                    break;
+                case 'dataEntry':
+                    dataEntryScreen.style.display = 'flex';
+                    // Reset form
+                    resetDataEntryForm();
+                    break;
+                case 'report':
+                    reportScreen.style.display = 'flex';
+                    enteredByDisplay.textContent = currentUser ? currentUser.username : '';
+                    break;
+                case 'settings':
+                    settingsScreen.style.display = 'flex';
+                    break;
+            }
+        }
+
+        // Show specific settings tab
+        function showSettingsTab(tabId) {
+            settingsTabs.forEach(tab => tab.classList.remove('active'));
+            settingsContents.forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.settings-tab[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(`${tabId}Tab`).classList.add('active');
+            
+            if (tabId === 'users') {
+                renderUsersTable();
+            } else if (tabId === 'sampleTypes') {
+                renderSampleTypesTable();
+            } else if (tabId === 'testTypes') {
+                renderTestTypesTable();
+            } else if (tabId === 'locations') {
+                renderLocationsTable();
+            } else if (tabId === 'images') {
+                renderCurrentImages();
+            }
+        }
+
+        // Switch language
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update UI buttons
+            arabicBtn.classList.toggle('active', lang === 'arabic');
+            englishBtn.classList.toggle('active', lang === 'english');
+            
+            // Update all UI text
+            updateLanguageUI();
+            
+            // Save language preference
+            localStorage.setItem('labAppLanguage', lang);
+        }
+
+        // Update UI with current language
+        function updateLanguageUI() {
+            const lang = translations[currentLanguage];
+            
+            // Update all elements with translations
+            for (const [key, value] of Object.entries(lang)) {
+                const elements = document.querySelectorAll(`[id="${key}"]`);
+                elements.forEach(el => {
+                    if (el.tagName === 'INPUT' && el.type !== 'button' && el.type !== 'submit') {
+                        el.placeholder = value;
+                    } else {
+                        el.textContent = value;
+                    }
+                });
+            }
+            
+            // Update select options
+            updateSelectOptions();
+            
+            // Update test number display
+            updateTestNumber();
+        }
+
+        // Update select options based on language
+        function updateSelectOptions() {
+            const lang = translations[currentLanguage];
+            
+            // Main location select
+            const mainLocationOptions = mainLocationSelect.querySelectorAll('option');
+            mainLocationOptions[0].textContent = lang.chooseMainLocation;
+            mainLocationOptions[1].textContent = 'مسالخ'; // These stay in Arabic as they are data
+            mainLocationOptions[2].textContent = 'أسواق مواشي';
+            
+            // Sub location select
+            const subLocationOptions = subLocationSelect.querySelectorAll('option');
+            subLocationOptions[0].textContent = lang.chooseSubLocation;
+            
+            // Animal type select
+            const animalTypeOptions = animalTypeSelect.querySelectorAll('option');
+            animalTypeOptions[0].textContent = lang.chooseAnimalType;
+            animalTypeOptions[1].textContent = lang.sheep;
+            animalTypeOptions[2].textContent = lang.goat;
+            animalTypeOptions[3].textContent = lang.camel;
+            animalTypeOptions[4].textContent = lang.cow;
+            
+            // Animal gender select
+            const animalGenderOptions = animalGenderSelect.querySelectorAll('option');
+            animalGenderOptions[0].textContent = lang.chooseGender;
+            animalGenderOptions[1].textContent = lang.male;
+            animalGenderOptions[2].textContent = lang.female;
+            
+            // Sample type select
+            const sampleTypeOptions = sampleTypeSelect.querySelectorAll('option');
+            sampleTypeOptions[0].textContent = lang.chooseSampleType;
+            sampleTypeOptions[1].textContent = lang.bloodSample;
+            sampleTypeOptions[2].textContent = lang.fatSample;
+            sampleTypeOptions[3].textContent = lang.meatSample;
+            sampleTypeOptions[4].textContent = lang.otherSample;
+            
+            // Test type select
+            const testTypeOptions = testTypeSelect.querySelectorAll('option');
+            testTypeOptions[0].textContent = lang.chooseTestType;
+            testTypeOptions[1].textContent = lang.brucellaTest;
+            testTypeOptions[2].textContent = lang.jaundiceTest;
+            testTypeOptions[3].textContent = lang.odorTest;
+            testTypeOptions[4].textContent = lang.antibioticTest;
+            testTypeOptions[5].textContent = lang.otherTest;
+            
+            // Test result select
+            const testResultOptions = testResultSelect.querySelectorAll('option');
+            testResultOptions[0].textContent = lang.chooseResult;
+            testResultOptions[1].textContent = lang.negativeResult;
+            testResultOptions[2].textContent = lang.positiveResult;
+            
+            // Report main location filter
+            const reportMainLocationOptions = reportMainLocationFilter.querySelectorAll('option');
+            reportMainLocationOptions[0].textContent = lang.allMainLocations;
+            reportMainLocationOptions[1].textContent = 'مسالخ';
+            reportMainLocationOptions[2].textContent = 'أسواق مواشي';
+            
+            // Report sub location filter
+            const reportSubLocationOptions = reportSubLocationFilter.querySelectorAll('option');
+            reportSubLocationOptions[0].textContent = lang.allSubLocations;
+            
+            // User main location select
+            const userMainLocationOptions = userMainLocationSelect.querySelectorAll('option');
+            userMainLocationOptions[0].textContent = lang.chooseMainLocation;
+            userMainLocationOptions[1].textContent = 'مسالخ';
+            userMainLocationOptions[2].textContent = 'أسواق مواشي';
+            
+            // User sub location select
+            const userSubLocationOptions = userSubLocationSelect.querySelectorAll('option');
+            userSubLocationOptions[0].textContent = lang.chooseSubLocation;
+            
+            // User role select
+            const userRoleOptions = userRoleSelect.querySelectorAll('option');
+            userRoleOptions[0].textContent = lang.adminRole;
+            userRoleOptions[1].textContent = lang.userRole;
+            
+            // Image type select
+            const imageTypeOptions = imageTypeSelect.querySelectorAll('option');
+            imageTypeOptions[0].textContent = lang.welcomeImage;
+            imageTypeOptions[1].textContent = lang.loginImage;
+            imageTypeOptions[2].textContent = lang.dashboardImage;
+            imageTypeOptions[3].textContent = lang.dataEntryImage;
+        }
+
+        // Handle login
+        function handleLogin() {
+            const employeeId = employeeIdInput.value.trim();
+            
+            if (!employeeId) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            const user = users.find(u => u.employeeId === employeeId);
+            
+            if (!user) {
+                alert(messages[currentLanguage].loginError);
+                return;
+            }
+            
+            currentUser = user;
+            alert(messages[currentLanguage].loginSuccess);
+            showScreen('dashboard');
+        }
+
+        // Handle logout
+        function handleLogout() {
+            currentUser = null;
+            employeeIdInput.value = '';
+            showScreen('login');
+        }
+
+        // Update test number
+        function updateTestNumber() {
+            testNumberDisplay.textContent = `${currentLanguage === 'arabic' ? 'رقم الاختبار: ' : 'Test Number: '}LT-${testCounter.toString().padStart(4, '0')}`;
+        }
+
+        // Reset data entry form
+        function resetDataEntryForm() {
+            const now = new Date();
+            testDateInput.valueAsDate = now;
+            testTimeInput.value = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            mainLocationSelect.value = '';
+            subLocationSelect.value = '';
+            subLocationSelect.disabled = true;
+            
+            ownerNameInput.value = '';
+            phoneNumberInput.value = '';
+            animalTypeSelect.value = '';
+            animalGenderSelect.value = '';
+            
+            sampleTypeSelect.value = '';
+            otherSampleTypeContainer.style.display = 'none';
+            otherSampleTypeInput.value = '';
+            
+            testTypeSelect.value = '';
+            otherTestTypeContainer.style.display = 'none';
+            otherTestTypeInput.value = '';
+            
+            testResultSelect.value = '';
+            testImageInput.value = '';
+            
+            testCounter++;
+            updateTestNumber();
+        }
+
+        // Update sub locations based on main location
+        function updateSubLocations() {
+            const mainLocation = mainLocationSelect.value;
+            
+            subLocationSelect.innerHTML = `<option value="">${translations[currentLanguage].chooseSubLocation}</option>`;
+            
+            if (mainLocation && locations[mainLocation]) {
+                subLocationSelect.disabled = false;
+                
+                locations[mainLocation].forEach(subLocation => {
+                    const option = document.createElement('option');
+                    option.value = subLocation;
+                    option.textContent = subLocation;
+                    subLocationSelect.appendChild(option);
+                });
+            } else {
+                subLocationSelect.disabled = true;
+            }
+        }
+
+        // Update report sub locations filter based on main location filter
+        function updateReportSubLocationsFilter() {
+            const mainLocation = reportMainLocationFilter.value;
+            
+            reportSubLocationFilter.innerHTML = `<option value="">${translations[currentLanguage].allSubLocations}</option>`;
+            
+            if (mainLocation && locations[mainLocation]) {
+                reportSubLocationFilter.disabled = false;
+                
+                locations[mainLocation].forEach(subLocation => {
+                    const option = document.createElement('option');
+                    option.value = subLocation;
+                    option.textContent = subLocation;
+                    reportSubLocationFilter.appendChild(option);
+                });
+            } else {
+                reportSubLocationFilter.disabled = true;
+            }
+        }
+
+        // Update user sub locations based on main location
+        function updateUserSubLocations() {
+            const mainLocation = userMainLocationSelect.value;
+            
+            userSubLocationSelect.innerHTML = `<option value="">${translations[currentLanguage].chooseSubLocation}</option>`;
+            
+            if (mainLocation && locations[mainLocation]) {
+                userSubLocationSelect.disabled = false;
+                
+                locations[mainLocation].forEach(subLocation => {
+                    const option = document.createElement('option');
+                    option.value = subLocation;
+                    option.textContent = subLocation;
+                    userSubLocationSelect.appendChild(option);
+                });
+            } else {
+                userSubLocationSelect.disabled = true;
+            }
+        }
+
+        // Add new test
+        function addTest() {
+            // Validate required fields
+            if (!mainLocationSelect.value || !subLocationSelect.value || !ownerNameInput.value || 
+                !animalTypeSelect.value || !animalGenderSelect.value || !sampleTypeSelect.value || 
+                !testTypeSelect.value || !testResultSelect.value) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            // Get sample type
+            let sampleType = sampleTypeSelect.value;
+            if (sampleType === translations[currentLanguage].otherSample && otherSampleTypeInput.value) {
+                sampleType = otherSampleTypeInput.value;
+            }
+            
+            // Get test type
+            let testType = testTypeSelect.value;
+            if (testType === translations[currentLanguage].otherTest && otherTestTypeInput.value) {
+                testType = otherTestTypeInput.value;
+            }
+            
+            // Create test object
+            const test = {
+                id: `LT-${testCounter.toString().padStart(4, '0')}`,
+                date: testDateInput.value,
+                time: testTimeInput.value,
+                mainLocation: mainLocationSelect.value,
+                subLocation: subLocationSelect.value,
+                owner: ownerNameInput.value,
+                phone: phoneNumberInput.value,
+                animalType: animalTypeSelect.value,
+                animalGender: animalGenderSelect.value,
+                sampleType: sampleType,
+                testType: testType,
+                result: testResultSelect.value,
+                image: null,
+                enteredBy: currentUser ? currentUser.username : '',
+                timestamp: new Date().getTime()
+            };
+            
+            // Handle image upload
+            if (testImageInput.files && testImageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    test.image = e.target.result;
+                    tests.push(test);
+                    saveData();
+                    resetDataEntryForm();
+                    
+                    // Show success message
+                    alert(messages[currentLanguage].testAdded);
+                };
+                reader.readAsDataURL(testImageInput.files[0]);
+            } else {
+                tests.push(test);
+                saveData();
+                resetDataEntryForm();
+                
+                // Show success message
+                alert(messages[currentLanguage].testAdded);
+            }
+        }
+
+        // Generate report
+        function generateReport() {
+            // Filter tests based on selected filters
+            let filteredTests = [...tests];
+            
+            const mainLocationFilter = reportMainLocationFilter.value;
+            const subLocationFilter = reportSubLocationFilter.value;
+            const dateFilter = reportDateFilter.value;
+            
+            if (mainLocationFilter) {
+                filteredTests = filteredTests.filter(test => test.mainLocation === mainLocationFilter);
+            }
+            
+            if (subLocationFilter) {
+                filteredTests = filteredTests.filter(test => test.subLocation === subLocationFilter);
+            }
+            
+            if (dateFilter) {
+                filteredTests = filteredTests.filter(test => test.date === dateFilter);
+            }
+            
+            // Sort by date (newest first)
+            filteredTests.sort((a, b) => b.timestamp - a.timestamp);
+            
+            // Clear table body
+            reportTableBody.innerHTML = '';
+            
+            // Add rows to table
+            filteredTests.forEach((test, index) => {
+                const row = document.createElement('tr');
+                
+                // Create image cell with clickable thumbnail if image exists
+                let imageCell = '-';
+                if (test.image) {
+                    const imgThumb = document.createElement('img');
+                    imgThumb.src = test.image;
+                    imgThumb.style.maxWidth = '50px';
+                    imgThumb.style.maxHeight = '50px';
+                    imgThumb.style.cursor = 'pointer';
+                    
+                    const imgLink = document.createElement('a');
+                    imgLink.href = '#';
+                    imgLink.appendChild(imgThumb);
+                    imgLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        showImageModal(test.image);
+                    });
+                    
+                    imageCell = imgLink.outerHTML;
+                }
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${test.date}</td>
+                    <td>${test.id}</td>
+                    <td>${test.mainLocation}</td>
+                    <td>${test.subLocation}</td>
+                    <td>${test.owner}</td>
+                    <td>${test.phone || '-'}</td>
+                    <td>${test.animalType}</td>
+                    <td>${test.animalGender}</td>
+                    <td>${test.sampleType}</td>
+                    <td>${test.testType}</td>
+                    <td>${test.result}</td>
+                    <td>${imageCell}</td>
+                `;
+                
+                reportTableBody.appendChild(row);
+            });
+            
+            // Update page footer
+            document.getElementById('pageFooter').textContent = 
+                `${currentLanguage === 'arabic' ? 'صفحة 1 من 1' : 'Page 1 of 1'}`;
+        }
+
+        // Show image modal
+        function showImageModal(imageSrc) {
+            modalImage.src = imageSrc;
+            imageModal.style.display = 'flex';
+        }
+
+        // Export to PDF
+        function exportToPdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.text(translations[currentLanguage].reportTitle, 105, 15, { align: 'center' });
+            
+            // Add filters info
+            doc.setFontSize(12);
+            let filtersText = '';
+            
+            if (reportMainLocationFilter.value) {
+                filtersText += `${currentLanguage === 'arabic' ? 'الموقع الرئيسي: ' : 'Main Location: '}${reportMainLocationFilter.value}\n`;
+            }
+            
+            if (reportSubLocationFilter.value) {
+                filtersText += `${currentLanguage === 'arabic' ? 'الموقع الفرعي: ' : 'Sub Location: '}${reportSubLocationFilter.value}\n`;
+            }
+            
+            if (reportDateFilter.value) {
+                filtersText += `${currentLanguage === 'arabic' ? 'التاريخ: ' : 'Date: '}${reportDateFilter.value}\n`;
+            }
+            
+            if (filtersText) {
+                doc.text(filtersText, 14, 25);
+            }
+            
+            // Prepare data for the table
+            const headers = [
+                '#',
+                translations[currentLanguage].dateHeader,
+                translations[currentLanguage].sampleNumberHeader,
+                translations[currentLanguage].mainLocationHeader,
+                translations[currentLanguage].subLocationHeader,
+                translations[currentLanguage].ownerHeader,
+                translations[currentLanguage].phoneHeader,
+                translations[currentLanguage].animalTypeHeader,
+                translations[currentLanguage].animalGenderHeader,
+                translations[currentLanguage].sampleTypeHeader,
+                translations[currentLanguage].testTypeHeader,
+                translations[currentLanguage].resultHeader
+            ];
+            
+            const filteredTests = getFilteredTests();
+            const data = filteredTests.map((test, index) => [
+                index + 1,
+                test.date,
+                test.id,
+                test.mainLocation,
+                test.subLocation,
+                test.owner,
+                test.phone || '-',
+                test.animalType,
+                test.animalGender,
+                test.sampleType,
+                test.testType,
+                test.result
+            ]);
+            
+            // Add table
+            doc.autoTable({
+                head: [headers],
+                body: data,
+                startY: filtersText ? 40 : 25,
+                styles: {
+                    font: 'helvetica',
+                    fontSize: 10,
+                    cellPadding: 2,
+                    overflow: 'linebreak'
+                },
+                headStyles: {
+                    fillColor: [165, 42, 42], // Brown color
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                columnStyles: {
+                    0: { cellWidth: 10 },
+                    1: { cellWidth: 20 },
+                    2: { cellWidth: 25 },
+                    3: { cellWidth: 25 },
+                    4: { cellWidth: 25 },
+                    5: { cellWidth: 25 },
+                    6: { cellWidth: 20 },
+                    7: { cellWidth: 20 },
+                    8: { cellWidth: 20 },
+                    9: { cellWidth: 25 },
+                    10: { cellWidth: 30 },
+                    11: { cellWidth: 20 }
+                },
+                margin: { top: 20 }
+            });
+            
+            // Add footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(10);
+                doc.text(`${currentLanguage === 'arabic' ? 'المدخل: ' : 'Entered by: '}${currentUser ? currentUser.username : ''}`, 14, doc.internal.pageSize.height - 10);
+                doc.text(`${currentLanguage === 'arabic' ? 'صفحة ' : 'Page '}${i} ${currentLanguage === 'arabic' ? 'من ' : 'of '}${pageCount}`, 
+                    doc.internal.pageSize.width - 20, doc.internal.pageSize.height - 10, { align: 'right' });
+            }
+            
+            // Save the PDF
+            doc.save(`Lab_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
+        }
+
+        // Get filtered tests for PDF export
+        function getFilteredTests() {
+            let filteredTests = [...tests];
+            
+            const mainLocationFilter = reportMainLocationFilter.value;
+            const subLocationFilter = reportSubLocationFilter.value;
+            const dateFilter = reportDateFilter.value;
+            
+            if (mainLocationFilter) {
+                filteredTests = filteredTests.filter(test => test.mainLocation === mainLocationFilter);
+            }
+            
+            if (subLocationFilter) {
+                filteredTests = filteredTests.filter(test => test.subLocation === subLocationFilter);
+            }
+            
+            if (dateFilter) {
+                filteredTests = filteredTests.filter(test => test.date === dateFilter);
+            }
+            
+            return filteredTests.sort((a, b) => b.timestamp - a.timestamp);
+        }
+
+        // Add new user
+        function addUser() {
+            const username = newUsernameInput.value.trim();
+            const employeeId = newEmployeeIdInput.value.trim();
+            const mainLocation = userMainLocationSelect.value;
+            const subLocation = userSubLocationSelect.value;
+            const role = userRoleSelect.value;
+            
+            if (!username || !employeeId) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            if (users.some(u => u.employeeId === employeeId)) {
+                alert(messages[currentLanguage].userExists);
+                return;
+            }
+            
+            const user = {
+                username,
+                employeeId,
+                mainLocation,
+                subLocation,
+                role
+            };
+            
+            users.push(user);
+            saveData();
+            renderUsersTable();
+            
+            // Clear form
+            newUsernameInput.value = '';
+            newEmployeeIdInput.value = '';
+            userMainLocationSelect.value = '';
+            userSubLocationSelect.value = '';
+            userSubLocationSelect.disabled = true;
+            userRoleSelect.value = 'admin';
+            
+            // Show success message
+            alert(messages[currentLanguage].userAdded);
+        }
+
+        // Render users table
+        function renderUsersTable() {
+            usersTableBody.innerHTML = '';
+            
+            users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                
+                const locationText = user.mainLocation ? 
+                    `${user.mainLocation}${user.subLocation ? ` - ${user.subLocation}` : ''}` : 
+                    (currentLanguage === 'arabic' ? 'جميع المواقع' : 'All locations');
+                
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.employeeId}</td>
+                    <td>${locationText}</td>
+                    <td>${user.role === 'admin' ? 
+                        (currentLanguage === 'arabic' ? 'مدير' : 'Admin') : 
+                        (currentLanguage === 'arabic' ? 'مستخدم' : 'User')}</td>
+                    <td>
+                        <button class="btn-3 edit-user" data-index="${index}">
+                            <i class="fas fa-edit"></i>
+                            ${translations[currentLanguage].editText}
+                        </button>
+                        <button class="btn-4 delete-user" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                            ${translations[currentLanguage].deleteText}
+                        </button>
+                    </td>
+                `;
+                
+                usersTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-user').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.target.closest('button').dataset.index;
+                    deleteUser(index);
+                });
+            });
+            
+            // Add event listeners to edit buttons
+            document.querySelectorAll('.edit-user').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.target.closest('button').dataset.index;
+                    editUser(index);
+                });
+            });
+        }
+
+        // Delete user
+        function deleteUser(index) {
+            if (confirm(messages[currentLanguage].confirmDelete)) {
+                users.splice(index, 1);
+                saveData();
+                renderUsersTable();
+            }
+        }
+
+        // Edit user
+        function editUser(index) {
+            const user = users[index];
+            
+            newUsernameInput.value = user.username;
+            newEmployeeIdInput.value = user.employeeId;
+            userMainLocationSelect.value = user.mainLocation || '';
+            updateUserSubLocations();
+            userSubLocationSelect.value = user.subLocation || '';
+            userRoleSelect.value = user.role;
+            
+            // Scroll to the form
+            document.getElementById('usersTab').scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
+            // Focus on username field
+            newUsernameInput.focus();
+            
+            // Remove the user from the array
+            users.splice(index, 1);
+            
+            // Update the table
+            renderUsersTable();
+        }
+
+        // Add new sample type
+        function addSampleType() {
+            const sampleType = newSampleTypeInput.value.trim();
+            
+            if (!sampleType) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            if (sampleTypes.includes(sampleType)) {
+                alert(messages[currentLanguage].sampleTypeExists);
+                return;
+            }
+            
+            sampleTypes.push(sampleType);
+            saveData();
+            renderSampleTypesTable();
+            
+            // Update sample type select in data entry
+            updateSampleTypeSelect();
+            
+            // Clear input
+            newSampleTypeInput.value = '';
+            
+            // Show success message
+            alert(messages[currentLanguage].sampleTypeAdded);
+        }
+
+        // Render sample types table
+        function renderSampleTypesTable() {
+            sampleTypesTableBody.innerHTML = '';
+            
+            sampleTypes.forEach((type, index) => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${type}</td>
+                    <td>
+                        <button class="btn-4 delete-sample-type" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                            ${translations[currentLanguage].deleteText}
+                        </button>
+                    </td>
+                `;
+                
+                sampleTypesTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-sample-type').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.target.closest('button').dataset.index;
+                    deleteSampleType(index);
+                });
+            });
+        }
+
+        // Delete sample type
+        function deleteSampleType(index) {
+            if (confirm(messages[currentLanguage].confirmDelete)) {
+                sampleTypes.splice(index, 1);
+                saveData();
+                renderSampleTypesTable();
+                updateSampleTypeSelect();
+            }
+        }
+
+        // Update sample type select in data entry
+        function updateSampleTypeSelect() {
+            const currentValue = sampleTypeSelect.value;
+            
+            sampleTypeSelect.innerHTML = `
+                <option value="">${translations[currentLanguage].chooseSampleType}</option>
+                ${sampleTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+                <option value="${translations[currentLanguage].otherSample}">${translations[currentLanguage].otherSample}</option>
+            `;
+            
+            sampleTypeSelect.value = currentValue;
+        }
+
+        // Add new test type
+        function addTestType() {
+            const testType = newTestTypeInput.value.trim();
+            
+            if (!testType) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            if (testTypes.includes(testType)) {
+                alert(messages[currentLanguage].testTypeExists);
+                return;
+            }
+            
+            testTypes.push(testType);
+            saveData();
+            renderTestTypesTable();
+            
+            // Update test type select in data entry
+            updateTestTypeSelect();
+            
+            // Clear input
+            newTestTypeInput.value = '';
+            
+            // Show success message
+            alert(messages[currentLanguage].testTypeAdded);
+        }
+
+        // Render test types table
+        function renderTestTypesTable() {
+            testTypesTableBody.innerHTML = '';
+            
+            testTypes.forEach((type, index) => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${type}</td>
+                    <td>
+                        <button class="btn-4 delete-test-type" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                            ${translations[currentLanguage].deleteText}
+                        </button>
+                    </td>
+                `;
+                
+                testTypesTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-test-type').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.target.closest('button').dataset.index;
+                    deleteTestType(index);
+                });
+            });
+        }
+
+        // Delete test type
+        function deleteTestType(index) {
+            if (confirm(messages[currentLanguage].confirmDelete)) {
+                testTypes.splice(index, 1);
+                saveData();
+                renderTestTypesTable();
+                updateTestTypeSelect();
+            }
+        }
+
+        // Update test type select in data entry
+        function updateTestTypeSelect() {
+            const currentValue = testTypeSelect.value;
+            
+            testTypeSelect.innerHTML = `
+                <option value="">${translations[currentLanguage].chooseTestType}</option>
+                ${testTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+                <option value="${translations[currentLanguage].otherTest}">${translations[currentLanguage].otherTest}</option>
+            `;
+            
+            testTypeSelect.value = currentValue;
+        }
+
+        // Add new main location
+        function addMainLocation() {
+            const location = newMainLocationInput.value.trim();
+            
+            if (!location) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            if (locations[location]) {
+                alert(messages[currentLanguage].locationExists);
+                return;
+            }
+            
+            locations[location] = [];
+            saveData();
+            renderLocationsTable();
+            
+            // Update location selects
+            updateLocationSelects();
+            
+            // Clear input
+            newMainLocationInput.value = '';
+            
+            // Show success message
+            alert(messages[currentLanguage].locationAdded);
+        }
+
+        // Add new sub location
+        function addSubLocation() {
+            const mainLocation = mainLocationForSubSelect.value;
+            const subLocation = newSubLocationInput.value.trim();
+            
+            if (!mainLocation) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            if (!subLocation) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            if (locations[mainLocation].includes(subLocation)) {
+                alert(messages[currentLanguage].locationExists);
+                return;
+            }
+            
+            locations[mainLocation].push(subLocation);
+            saveData();
+            renderLocationsTable();
+            
+            // Update location selects
+            updateLocationSelects();
+            
+            // Clear input
+            newSubLocationInput.value = '';
+            
+            // Show success message
+            alert(messages[currentLanguage].locationAdded);
+        }
+
+        // Render locations table
+        function renderLocationsTable() {
+            locationsTableBody.innerHTML = '';
+            
+            for (const [mainLocation, subLocations] of Object.entries(locations)) {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${mainLocation}</td>
+                    <td>${subLocations.join(', ')}</td>
+                    <td>
+                        <button class="btn-4 delete-location" data-location="${mainLocation}">
+                            <i class="fas fa-trash"></i>
+                            ${translations[currentLanguage].deleteText}
+                        </button>
+                    </td>
+                `;
+                
+                locationsTableBody.appendChild(row);
+            }
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-location').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const location = e.target.closest('button').dataset.location;
+                    deleteLocation(location);
+                });
+            });
+        }
+
+        // Delete location
+        function deleteLocation(location) {
+            if (confirm(messages[currentLanguage].confirmDelete)) {
+                delete locations[location];
+                saveData();
+                renderLocationsTable();
+                updateLocationSelects();
+            }
+        }
+
+        // Update location selects in all forms
+        function updateLocationSelects() {
+            const currentMainLocation = mainLocationSelect.value;
+            const currentReportMainLocation = reportMainLocationFilter.value;
+            const currentUserMainLocation = userMainLocationSelect.value;
+            const currentMainLocationForSub = mainLocationForSubSelect.value;
+            
+            // Main location select in data entry
+            mainLocationSelect.innerHTML = `
+                <option value="">${translations[currentLanguage].chooseMainLocation}</option>
+                ${Object.keys(locations).map(loc => `<option value="${loc}">${loc}</option>`).join('')}
+            `;
+            mainLocationSelect.value = currentMainLocation;
+            updateSubLocations();
+            
+            // Main location filter in report
+            reportMainLocationFilter.innerHTML = `
+                <option value="">${translations[currentLanguage].allMainLocations}</option>
+                ${Object.keys(locations).map(loc => `<option value="${loc}">${loc}</option>`).join('')}
+            `;
+            reportMainLocationFilter.value = currentReportMainLocation;
+            updateReportSubLocationsFilter();
+            
+            // Main location select in user management
+            userMainLocationSelect.innerHTML = `
+                <option value="">${translations[currentLanguage].chooseMainLocation}</option>
+                ${Object.keys(locations).map(loc => `<option value="${loc}">${loc}</option>`).join('')}
+            `;
+            userMainLocationSelect.value = currentUserMainLocation;
+            updateUserSubLocations();
+            
+            // Main location select for sub locations
+            mainLocationForSubSelect.innerHTML = `
+                <option value="">${translations[currentLanguage].chooseMainLocation}</option>
+                ${Object.keys(locations).map(loc => `<option value="${loc}">${loc}</option>`).join('')}
+            `;
+            mainLocationForSubSelect.value = currentMainLocationForSub;
+        }
+
+        // Save image
+        function saveImage() {
+            const imageType = imageTypeSelect.value;
+            const file = uploadImageInput.files[0];
+            
+            if (!file) {
+                alert(messages[currentLanguage].requiredFields);
+                return;
+            }
+            
+            if (file.size > 250 * 1024) { // 250KB
+                alert(currentLanguage === 'arabic' ? 'حجم الصورة يجب أن يكون أقل من 250 كيلوبايت' : 'Image size must be less than 250KB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                images[imageType] = e.target.result;
+                saveData();
+                renderCurrentImages();
+                
+                // Update image in UI if it's currently displayed
+                if (imageType === 'welcome') {
+                    document.getElementById('welcomeImage').src = images.welcome;
+                } else if (imageType === 'login') {
+                    document.getElementById('loginImage').src = images.login;
+                } else if (imageType === 'dashboard') {
+                    document.getElementById('dashboardImage').src = images.dashboard;
+                } else if (imageType === 'dataEntry') {
+                    document.getElementById('dataEntryImage').src = images.dataEntry;
+                }
+                
+                // Clear input
+                uploadImageInput.value = '';
+                
+                // Show success message
+                alert(messages[currentLanguage].imageSaved);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Render current images
+        function renderCurrentImages() {
+            currentImagesPreview.innerHTML = '';
+            
+            for (const [type, src] of Object.entries(images)) {
+                if (src) {
+                    const div = document.createElement('div');
+                    div.style.marginBottom = '20px';
+                    
+                    const label = document.createElement('h5');
+                    label.textContent = translations[currentLanguage][`${type}Image`];
+                    div.appendChild(label);
+                    
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.style.maxWidth = '200px';
+                    img.style.maxHeight = '100px';
+                    img.style.display = 'block';
+                    img.style.margin = '10px 0';
+                    img.style.cursor = 'pointer';
+                    img.addEventListener('click', () => showImageModal(src));
+                    div.appendChild(img);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-4';
+                    deleteBtn.innerHTML = `
+                        <i class="fas fa-trash"></i>
+                        ${translations[currentLanguage].deleteText}
+                    `;
+                    deleteBtn.style.marginTop = '5px';
+                    deleteBtn.addEventListener('click', () => deleteImage(type));
+                    div.appendChild(deleteBtn);
+                    
+                    currentImagesPreview.appendChild(div);
+                }
+            }
+            
+            if (currentImagesPreview.children.length === 0) {
+                currentImagesPreview.innerHTML = `<p>${currentLanguage === 'arabic' ? 'لا توجد صور محفوظة' : 'No saved images'}</p>`;
+            }
+        }
+
+        // Delete image
+        function deleteImage(type) {
+            if (confirm(messages[currentLanguage].confirmDelete)) {
+                images[type] = null;
+                saveData();
+                renderCurrentImages();
+                
+                // Remove image from UI if it's currently displayed
+                if (type === 'welcome') {
+                    document.getElementById('welcomeImage').src = '';
+                } else if (type === 'login') {
+                    document.getElementById('loginImage').src = '';
+                } else if (type === 'dashboard') {
+                    document.getElementById('dashboardImage').src = '';
+                } else if (type === 'dataEntry') {
+                    document.getElementById('dataEntryImage').src = '';
+                }
+            }
+        }
+
+        // Save theme
+        function saveTheme() {
+            saveData();
+            applyTheme();
+            
+            // Show success message
+            alert(messages[currentLanguage].themeSaved);
+        }
+
+        // Apply theme
+        function applyTheme() {
+            let primaryColor, secondaryColor, accentColor, lightGreen;
+            
+            switch (theme) {
+                case 'light-brown':
+                    primaryColor = '#D2B48C';
+                    secondaryColor = '#A52A2A';
+                    accentColor = '#87CEEB';
+                    lightGreen = '#C8D5B9';
+                    break;
+                case 'brown':
+                    primaryColor = '#A52A2A';
+                    secondaryColor = '#8B4513';
+                    accentColor = '#87CEEB';
+                    lightGreen = '#C8D5B9';
+                    break;
+                case 'sky-blue':
+                    primaryColor = '#87CEEB';
+                    secondaryColor = '#4682B4';
+                    accentColor = '#D2B48C';
+                    lightGreen = '#C8D5B9';
+                    break;
+                case 'light-green':
+                    primaryColor = '#C8D5B9';
+                    secondaryColor = '#556B2F';
+                    accentColor = '#87CEEB';
+                    lightGreen = '#D2B48C';
+                    break;
+            }
+            
+            document.documentElement.style.setProperty('--primary-color', primaryColor);
+            document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+            document.documentElement.style.setProperty('--accent-color', accentColor);
+            document.documentElement.style.setProperty('--light-green', lightGreen);
+        }
+
+        // Save all data to localStorage
+        function saveData() {
+            const appData = {
+                users,
+                tests,
+                testCounter,
+                sampleTypes,
+                testTypes,
+                locations,
+                images,
+                theme,
+                language: currentLanguage
+            };
+            
+            localStorage.setItem('labAppData', JSON.stringify(appData));
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('labAppData');
+            
+            if (savedData) {
+                const appData = JSON.parse(savedData);
+                
+                users = appData.users || users;
+                tests = appData.tests || tests;
+                testCounter = appData.testCounter || testCounter;
+                sampleTypes = appData.sampleTypes || sampleTypes;
+                testTypes = appData.testTypes || testTypes;
+                locations = appData.locations || locations;
+                images = appData.images || images;
+                theme = appData.theme || theme;
+                currentLanguage = appData.language || currentLanguage;
+                
+                // Update selects with loaded data
+                updateSampleTypeSelect();
+                updateTestTypeSelect();
+                updateLocationSelects();
+                
+                // Apply theme
+                applyTheme();
+                
+                // Set images if they exist
+                if (images.welcome) {
+                    document.getElementById('welcomeImage').src = images.welcome;
+                }
+                if (images.login) {
+                    document.getElementById('loginImage').src = images.login;
+                }
+                if (images.dashboard) {
+                    document.getElementById('dashboardImage').src = images.dashboard;
+                }
+                if (images.dataEntry) {
+                    document.getElementById('dataEntryImage').src = images.dataEntry;
+                }
+            }
+            
+            // Load language preference separately
+            const savedLanguage = localStorage.getItem('labAppLanguage');
+            if (savedLanguage) {
+                currentLanguage = savedLanguage;
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
