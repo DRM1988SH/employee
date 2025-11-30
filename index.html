@@ -249,6 +249,18 @@
             position: relative;
             min-height: 50px;
         }
+
+        /* تنسيقات PDF */
+        .pdf-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 8px 15px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -556,8 +568,8 @@
 
             </div>
 
-            <!-- Footer PDF -->
-            <div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 10px; display: flex; justify-content: space-between; font-size: 12px; height: 15px;">
+            <!-- Footer PDF الثابت -->
+            <div class="pdf-footer" style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: #f8f9fa; border-top: 1px solid #dee2e6; padding: 8px 15px; font-size: 12px; display: flex; justify-content: space-between;">
                 <div style="direction: ltr;">info@grisland.com - صفحة من - 0568504018</div>
                 <div>جميع الحقوق محفوظة - للاستعمال الرسمي فقط</div>
             </div>
@@ -688,7 +700,6 @@
             if (role === 'admin') {
                 navSettings.classList.remove('hidden');
                 loadSettingsView();
-                initSignaturePads();
             } else {
                 navSettings.classList.add('hidden');
             }
@@ -696,6 +707,9 @@
             // تحميل البيانات الأساسية
             loadSitesDropdown();
             document.getElementById('month-picker').value = currentMonth;
+            
+            // تهيئة لوحات التوقيع لجميع المستخدمين
+            initSignaturePads();
         }
 
         function showScreen(screenId) {
@@ -989,12 +1003,12 @@
         }
 
         function loadSettingsView() {
-            // Load Users
+            // Load Users - التصحيح: عرض جميع المستخدمين بما فيهم مدير النظام
             const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
             const tbody = document.getElementById('users-table-body');
             tbody.innerHTML = '';
             users.forEach((u, idx) => {
-                if(u.id === '600') return; 
+                // إزالة الشرط الذي كان يحذف مدير النظام
                 const hasSig = u.signature ? 
                     `<div class="signature-dropdown">
                         <img src="${u.signature}" class="signature-img mx-auto cursor-pointer" onclick="openSignatureModal('user', '${u.id}')">
@@ -1017,7 +1031,9 @@
                     <td class="p-2 text-right">${getRoleName(u.role)}</td>
                     <td class="p-2 text-right">${u.id}</td>
                     <td class="p-2 text-center">${hasSig}</td>
-                    <td class="p-2"><button onclick="deleteUser('${u.id}')" class="text-red-500 hover:text-red-700">X</button></td>
+                    <td class="p-2">
+                        ${u.id !== '600' ? `<button onclick="deleteUser('${u.id}')" class="text-red-500 hover:text-red-700">X</button>` : '<span class="text-gray-400">-</span>'}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1171,6 +1187,11 @@
         }
 
         function deleteUser(id) {
+            if (id === '600') {
+                showToast('لا يمكن حذف مدير النظام الرئيسي.', 'error');
+                return;
+            }
+            
             if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
                 let users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
                 users = users.filter(u => u.id !== id);
@@ -1250,21 +1271,32 @@
             pdfContainer.innerHTML = '';
             pdfContainer.appendChild(tableClone);
 
-            // Handle Real Signatures in Footer
+            // Handle Real Signatures in Footer - التصحيح: البحث عن المستخدمين بشكل صحيح
             const supSignDiv = document.getElementById('pdf-supervisor-sign');
             const appSignDiv = document.getElementById('pdf-approver-sign');
             
             const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
-            const supervisorUser = users.find(u => u.role === 'supervisor'); 
-            const approverUser = users.find(u => u.role === 'approver');
+            
+            // البحث عن المستخدمين المعتمدين - التصحيح: استخدام find بشكل صحيح
+            let supervisorUser = null;
+            let approverUser = null;
+            
+            // البحث عن أي مستخدم لديه دور مشرف ومعتمد
+            users.forEach(user => {
+                if (user.role === 'supervisor') supervisorUser = user;
+                if (user.role === 'approver') approverUser = user;
+            });
 
             const createSigImg = (src) => `<img src="${src}" style="height: 60px; max-width: 150px; object-fit: contain;">`;
 
             // توقيع المشرف
             if(approvals.supervisor && supervisorUser && supervisorUser.signature) {
                 supSignDiv.innerHTML = createSigImg(supervisorUser.signature);
-            } else if (approvals.supervisor) {
-                supSignDiv.innerHTML = `<span style="color:green; font-family:'Courier'">تم الاعتماد (بدون توقيع مرفوع)</span>`;
+            } else if (approvals.supervisor && supervisorUser) {
+                supSignDiv.innerHTML = `<div style="text-align: center;">
+                    <div style="border-bottom: 1px dashed #000; width: 200px; margin: 40px auto 0 auto;"></div>
+                    <p style="margin-top: 5px; font-size: 12px;">${supervisorUser.name}</p>
+                </div>`;
             } else {
                 supSignDiv.innerHTML = `<div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>`;
             }
@@ -1272,18 +1304,21 @@
             // توقيع المعتمد
             if(approvals.approver && approverUser && approverUser.signature) {
                 appSignDiv.innerHTML = createSigImg(approverUser.signature);
-            } else if (approvals.approver) {
-                appSignDiv.innerHTML = `<span style="color:green; font-family:'Courier'">تم الاعتماد (بدون توقيع مرفوع)</span>`;
+            } else if (approvals.approver && approverUser) {
+                appSignDiv.innerHTML = `<div style="text-align: center;">
+                    <div style="border-bottom: 1px dashed #000; width: 200px; margin: 40px auto 0 auto;"></div>
+                    <p style="margin-top: 5px; font-size: 12px;">${approverUser.name}</p>
+                </div>`;
             } else {
                 appSignDiv.innerHTML = `<div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>`;
             }
 
-            // 3. Generate
+            // 3. Generate مع إضافة الفوتر الثابت
             const element = document.getElementById('pdf-template');
             element.style.display = 'block'; 
             
             const opt = {
-                margin: 0.2,
+                margin: [0.2, 0.2, 0.5, 0.2], // زيادة الهامش السفلي للفوتر
                 filename: `تقرير_${siteName}_${monthVal}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
@@ -1295,7 +1330,9 @@
                     unit: 'in', 
                     format: 'a4', 
                     orientation: 'landscape' 
-                }
+                },
+                // إعدادات للفوتر الثابت
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
             // استخدام save() لتنزيل الملف مباشرة
@@ -1320,50 +1357,66 @@
         function initSignaturePads() {
             // تهيئة لوحة توقيع المستخدم
             userSignatureCanvas = document.getElementById('user-signature-canvas');
-            userSignatureCtx = userSignatureCanvas.getContext('2d');
-            userSignatureCanvas.width = userSignatureCanvas.offsetWidth;
-            userSignatureCanvas.height = userSignatureCanvas.offsetHeight;
-            userSignatureCtx.fillStyle = 'white';
-            userSignatureCtx.fillRect(0, 0, userSignatureCanvas.width, userSignatureCanvas.height);
-            userSignatureCtx.strokeStyle = '#000';
-            userSignatureCtx.lineWidth = 2;
-            userSignatureCtx.lineCap = 'round';
+            if (userSignatureCanvas) {
+                userSignatureCtx = userSignatureCanvas.getContext('2d');
+                userSignatureCanvas.width = userSignatureCanvas.offsetWidth;
+                userSignatureCanvas.height = userSignatureCanvas.offsetHeight;
+                userSignatureCtx.fillStyle = 'white';
+                userSignatureCtx.fillRect(0, 0, userSignatureCanvas.width, userSignatureCanvas.height);
+                userSignatureCtx.strokeStyle = '#000';
+                userSignatureCtx.lineWidth = 2;
+                userSignatureCtx.lineCap = 'round';
+            }
 
             // تهيئة لوحة توقيع الموظف
             employeeSignatureCanvas = document.getElementById('employee-signature-canvas');
-            employeeSignatureCtx = employeeSignatureCanvas.getContext('2d');
-            employeeSignatureCanvas.width = employeeSignatureCanvas.offsetWidth;
-            employeeSignatureCanvas.height = employeeSignatureCanvas.offsetHeight;
-            employeeSignatureCtx.fillStyle = 'white';
-            employeeSignatureCtx.fillRect(0, 0, employeeSignatureCanvas.width, employeeSignatureCanvas.height);
-            employeeSignatureCtx.strokeStyle = '#000';
-            employeeSignatureCtx.lineWidth = 2;
-            employeeSignatureCtx.lineCap = 'round';
+            if (employeeSignatureCanvas) {
+                employeeSignatureCtx = employeeSignatureCanvas.getContext('2d');
+                employeeSignatureCanvas.width = employeeSignatureCanvas.offsetWidth;
+                employeeSignatureCanvas.height = employeeSignatureCanvas.offsetHeight;
+                employeeSignatureCtx.fillStyle = 'white';
+                employeeSignatureCtx.fillRect(0, 0, employeeSignatureCanvas.width, employeeSignatureCanvas.height);
+                employeeSignatureCtx.strokeStyle = '#000';
+                employeeSignatureCtx.lineWidth = 2;
+                employeeSignatureCtx.lineCap = 'round';
+            }
 
             // تهيئة لوحة توقيع المودال
             modalSignatureCanvas = document.getElementById('modal-signature-canvas');
-            modalSignatureCtx = modalSignatureCanvas.getContext('2d');
-            modalSignatureCanvas.width = modalSignatureCanvas.offsetWidth;
-            modalSignatureCanvas.height = modalSignatureCanvas.offsetHeight;
-            modalSignatureCtx.fillStyle = 'white';
-            modalSignatureCtx.fillRect(0, 0, modalSignatureCanvas.width, modalSignatureCanvas.height);
-            modalSignatureCtx.strokeStyle = '#000';
-            modalSignatureCtx.lineWidth = 2;
-            modalSignatureCtx.lineCap = 'round';
+            if (modalSignatureCanvas) {
+                modalSignatureCtx = modalSignatureCanvas.getContext('2d');
+                modalSignatureCanvas.width = modalSignatureCanvas.offsetWidth;
+                modalSignatureCanvas.height = modalSignatureCanvas.offsetHeight;
+                modalSignatureCtx.fillStyle = 'white';
+                modalSignatureCtx.fillRect(0, 0, modalSignatureCanvas.width, modalSignatureCanvas.height);
+                modalSignatureCtx.strokeStyle = '#000';
+                modalSignatureCtx.lineWidth = 2;
+                modalSignatureCtx.lineCap = 'round';
+            }
 
             // إضافة مستمعي الأحداث للوحة توقيع المستخدم
-            setupCanvasEvents(userSignatureCanvas, userSignatureCtx, 'user');
+            if (userSignatureCanvas) {
+                setupCanvasEvents(userSignatureCanvas, userSignatureCtx, 'user');
+            }
             
             // إضافة مستمعي الأحداث للوحة توقيع الموظف
-            setupCanvasEvents(employeeSignatureCanvas, employeeSignatureCtx, 'employee');
+            if (employeeSignatureCanvas) {
+                setupCanvasEvents(employeeSignatureCanvas, employeeSignatureCtx, 'employee');
+            }
             
             // إضافة مستمعي الأحداث للوحة توقيع المودال
-            setupCanvasEvents(modalSignatureCanvas, modalSignatureCtx, 'modal');
+            if (modalSignatureCanvas) {
+                setupCanvasEvents(modalSignatureCanvas, modalSignatureCtx, 'modal');
+            }
 
             // إضافة مستمعي الأحداث لأزرار المسح
-            document.getElementById('clear-user-signature').addEventListener('click', () => clearSignature('user'));
-            document.getElementById('clear-employee-signature').addEventListener('click', () => clearSignature('employee'));
-            document.getElementById('clear-modal-signature').addEventListener('click', () => clearSignature('modal'));
+            const clearUserBtn = document.getElementById('clear-user-signature');
+            const clearEmployeeBtn = document.getElementById('clear-employee-signature');
+            const clearModalBtn = document.getElementById('clear-modal-signature');
+            
+            if (clearUserBtn) clearUserBtn.addEventListener('click', () => clearSignature('user'));
+            if (clearEmployeeBtn) clearEmployeeBtn.addEventListener('click', () => clearSignature('employee'));
+            if (clearModalBtn) clearModalBtn.addEventListener('click', () => clearSignature('modal'));
         }
 
         function setupCanvasEvents(canvas, ctx, type) {
@@ -1442,11 +1495,20 @@
                 ctx = modalSignatureCtx;
             }
             
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
+            if (canvas && ctx) {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+            }
+        }
+
+        // دالة مساعدة للتحقق من صحة التوقيع
+        function isValidSignature(signatureData) {
+            return signatureData && 
+                   signatureData !== '' && 
+                   !signatureData.includes('base64,AAAA');
         }
 
         function openSignatureModal(type, id, empIndex = null) {
@@ -1483,12 +1545,19 @@
         }
 
         function saveSignature() {
+            const signatureData = modalSignatureCanvas.toDataURL();
+            
+            if (!isValidSignature(signatureData)) {
+                showToast('يرجى إضافة توقيع صالح', 'error');
+                return;
+            }
+            
             if (currentSignatureType === 'user') {
                 // حفظ توقيع المستخدم
                 const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
                 const userIndex = users.findIndex(u => u.id === currentSignatureId);
                 if (userIndex !== -1) {
-                    users[userIndex].signature = modalSignatureCanvas.toDataURL();
+                    users[userIndex].signature = signatureData;
                     localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
                     showToast('تم حفظ توقيع المستخدم بنجاح', 'success');
                     loadSettingsView();
@@ -1497,8 +1566,8 @@
                 // حفظ توقيع الموظف
                 const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
                 const siteIndex = sites.findIndex(s => s.id === currentSignatureId);
-                if (siteIndex !== -1) {
-                    sites[siteIndex].employees[currentEmpIndex].signature = modalSignatureCanvas.toDataURL();
+                if (siteIndex !== -1 && currentEmpIndex !== null) {
+                    sites[siteIndex].employees[currentEmpIndex].signature = signatureData;
                     localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
                     showToast('تم حفظ توقيع الموظف بنجاح', 'success');
                     loadAttendanceTable();
