@@ -241,19 +241,36 @@
             object-fit: contain;
         }
 
-        /* تنسيقات PDF ثابتة */
+        /* تنسيقات PDF محسنة */
+        .pdf-page {
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+            font-family: 'Cairo', sans-serif;
+            page-break-after: always;
+        }
+        
         .pdf-footer {
-            position: fixed;
+            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 15px;
+            height: 40px;
             border-top: 1px solid #ccc;
-            padding-top: 10px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
             font-size: 12px;
             background: white;
+            box-sizing: border-box;
+        }
+        
+        .pdf-header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
         }
     </style>
 </head>
@@ -491,51 +508,9 @@
         </div>
     </div>
 
+    <!-- قالب PDF محسن مع فوتر ثابت -->
     <div id="pdf-template" style="display: none;">
-        <div style="padding: 20px; direction: rtl; font-family: 'Cairo', sans-serif; position: relative; min-height: 100vh;">
-            
-            <div style="margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 10px;">
-                <div style="position: relative; height: 120px; display: flex; align-items: center; justify-content: center;">
-                    <img id="pdf-logo" src="" style="position: absolute; left: 0; top: 10px; height: 100px; width: 100px; object-fit: contain;">
-                    
-                    <h1 style="font-family: 'PT Serif', serif; font-size: 20pt; font-weight: bold; text-align: center; width: 100%; color: #166534;">
-                        شركة الجزيرة الخضراء لتجارة المواشي والأغنام
-                    </h1>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 16pt; font-weight: bold; margin-top: 10px;">
-                    <div style="text-align: right;">التاريخ: <span id="pdf-date"></span></div>
-                    <div style="text-align: left;">الموقع: <span id="pdf-site-name"></span></div>
-                </div>
-            </div>
-
-            <div id="pdf-table-container"></div>
-
-            <div style="margin-top: 50px; display: flex; justify-content: space-around; width: 100%;">
-                
-                <div style="text-align: center; width: 250px;">
-                    <p style="font-weight: bold; font-size: 16pt; margin-bottom: 15px;">معتمد التقرير</p>
-                    <div id="pdf-approver-sign" style="min-height: 80px; display: flex; justify-content: center; align-items: center;">
-                        <div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>
-                    </div>
-                </div>
-
-                <div style="text-align: center; width: 250px;">
-                    <p style="font-weight: bold; font-size: 16pt; margin-bottom: 15px;">مشرف الموقع</p>
-                    <div id="pdf-supervisor-sign" style="min-height: 80px; display: flex; justify-content: center; align-items: center;">
-                        <div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- فوتر PDF ثابت -->
-            <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 15px; border-top: 1px solid #ccc; padding-top: 10px; display: flex; justify-content: space-between; font-size: 12px; background: white; padding-left: 20px; padding-right: 20px;">
-                <div style="direction: ltr;">Info@grisland.com</div>
-                <div style="text-align: center;">0568504018- الشهامة الجديدة - مسلخ الشهامة</div>
-                <div>صفحة 1-1</div>
-            </div>
-        </div>
+        <!-- سيتم إنشاء الصفحات ديناميكياً هنا -->
     </div>
 
     <script>
@@ -762,7 +737,8 @@
                 const tr = document.createElement('tr');
                 let rowHTML = `<td class="sticky right-0 bg-white font-bold z-10">${emp.name}</td><td>${emp.role}</td>`;
                 
-                let attendanceDays = daysInMonth; // البدء بعدد أيام الشهر كاملة
+                // حساب أيام الحضور الفعلية
+                let attendanceDays = 0;
                 
                 for (let i = 1; i <= daysInMonth; i++) {
                     const status = siteAttendance[index] && siteAttendance[index][i] ? siteAttendance[index][i] : 'P';
@@ -777,6 +753,11 @@
                         </td>`;
                     } else {
                         rowHTML += `<td class="text-gray-600 font-bold">${status || 'P'}</td>`;
+                    }
+                    
+                    // حساب أيام الحضور: P و V تعتبر حضور
+                    if (status === 'P' || status === 'V') {
+                        attendanceDays++;
                     }
                 }
                 
@@ -806,7 +787,10 @@
                 
                 tr.innerHTML = rowHTML;
                 tableBody.appendChild(tr);
-                
+            });
+            
+            // تحديث أيام الحضور بعد تحميل الجدول
+            site.employees.forEach((emp, index) => {
                 updateAttendanceDays(index, daysInMonth);
             });
         }
@@ -817,13 +801,13 @@
             
             const daySelects = row.querySelectorAll('.attendance-select');
             
-            let attendanceDays = daysInMonth; // البدء بعدد أيام الشهر كاملة
+            let attendanceDays = 0;
             
             daySelects.forEach(select => {
-                if (select.value === 'A') {
-                    attendanceDays--; // خصم يوم عند وجود A
+                if (select.value === 'P' || select.value === 'V') {
+                    attendanceDays++; // إضافة يوم عند وجود P أو V
                 }
-                // V لا تؤثر على الحساب
+                // A لا تضاف إلى الحضور
             });
             
             const attendanceDaysElement = document.getElementById(`attendance-days-${empIndex}`);
@@ -1132,17 +1116,11 @@
             const allApprovals = JSON.parse(localStorage.getItem(DB_KEYS.APPROVALS));
             const approvals = allApprovals[key] || { supervisor: false, approver: false };
 
-            document.getElementById('pdf-site-name').innerText = siteName;
-            document.getElementById('pdf-date').innerText = monthVal;
+            // إنشاء قالب PDF ديناميكي مع فوتر ثابت في كل صفحة
+            const pdfTemplate = document.getElementById('pdf-template');
+            pdfTemplate.innerHTML = '';
             
-            const pdfLogo = document.getElementById('pdf-logo');
-            if(logoSrc) {
-                pdfLogo.src = logoSrc;
-                pdfLogo.style.display = 'block';
-            } else {
-                pdfLogo.style.display = 'none';
-            }
-
+            // نسخ الجدول الأصلي وتعديله للتصدير
             const originalTable = document.getElementById('main-table');
             const tableClone = originalTable.cloneNode(true);
             
@@ -1160,41 +1138,129 @@
             
             const dropdowns = tableClone.querySelectorAll('.signature-dropdown-content');
             dropdowns.forEach(dropdown => dropdown.remove());
-
-            tableClone.style.width = "100%";
-            tableClone.style.fontSize = "10px";
             
-            const pdfContainer = document.getElementById('pdf-table-container');
-            pdfContainer.innerHTML = '';
-            pdfContainer.appendChild(tableClone);
-
-            const supSignDiv = document.getElementById('pdf-supervisor-sign');
-            const appSignDiv = document.getElementById('pdf-approver-sign');
-            
+            // إعداد التوقيعات
             const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
             const supervisorUser = users.find(u => u.role === 'supervisor'); 
             const approverUser = users.find(u => u.role === 'approver');
 
             const createSigImg = (src) => `<img src="${src}" style="height: 60px; max-width: 150px; object-fit: contain;">`;
 
+            let supervisorSignature = '';
+            let approverSignature = '';
+            
             if(approvals.supervisor && supervisorUser && supervisorUser.signature) {
-                supSignDiv.innerHTML = createSigImg(supervisorUser.signature);
+                supervisorSignature = createSigImg(supervisorUser.signature);
             } else if (approvals.supervisor) {
-                supSignDiv.innerHTML = `<span style="color:green; font-family:'Courier'">تم الاعتماد (بدون توقيع مرفوع)</span>`;
+                supervisorSignature = `<span style="color:green; font-family:'Courier'">تم الاعتماد (بدون توقيع مرفوع)</span>`;
             } else {
-                supSignDiv.innerHTML = `<div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>`;
+                supervisorSignature = `<div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>`;
             }
 
             if(approvals.approver && approverUser && approverUser.signature) {
-                appSignDiv.innerHTML = createSigImg(approverUser.signature);
+                approverSignature = createSigImg(approverUser.signature);
             } else if (approvals.approver) {
-                appSignDiv.innerHTML = `<span style="color:green; font-family:'Courier'">تم الاعتماد (بدون توقيع مرفوع)</span>`;
+                approverSignature = `<span style="color:green; font-family:'Courier'">تم الاعتماد (بدون توقيع مرفوع)</span>`;
             } else {
-                appSignDiv.innerHTML = `<div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>`;
+                approverSignature = `<div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>`;
             }
 
-            const element = document.getElementById('pdf-template');
-            element.style.display = 'block'; 
+            // إنشاء صفحات PDF مع فوتر ثابت في كل صفحة
+            const createPDFPage = (content, pageNum, totalPages) => {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'pdf-page';
+                
+                // رأس الصفحة
+                let headerHTML = `
+                    <div class="pdf-header">
+                        <div style="position: relative; height: 120px; display: flex; align-items: center; justify-content: center;">
+                            ${logoSrc ? `<img src="${logoSrc}" style="position: absolute; left: 0; top: 10px; height: 100px; width: 100px; object-fit: contain;">` : ''}
+                            
+                            <h1 style="font-family: 'PT Serif', serif; font-size: 20pt; font-weight: bold; text-align: center; width: 100%; color: #166534;">
+                                شركة الجزيرة الخضراء لتجارة المواشي والأغنام
+                            </h1>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 16pt; font-weight: bold; margin-top: 10px;">
+                            <div style="text-align: right;">التاريخ: <span>${monthVal}</span></div>
+                            <div style="text-align: left;">الموقع: <span>${siteName}</span></div>
+                        </div>
+                    </div>
+                `;
+                
+                // محتوى الصفحة
+                let contentHTML = `
+                    <div style="margin-bottom: 20px;">
+                        ${content}
+                    </div>
+                `;
+                
+                // تذييل الصفحة الثابت
+                let footerHTML = `
+                    <div class="pdf-footer">
+                        <div style="direction: ltr;">Info@grisland.com</div>
+                        <div style="text-align: center;">0568504018- الشهامة الجديدة - مسلخ الشهامة</div>
+                        <div>صفحة ${pageNum} من ${totalPages}</div>
+                    </div>
+                `;
+                
+                // توقيعات في الصفحة الأخيرة فقط
+                if (pageNum === totalPages) {
+                    contentHTML += `
+                        <div style="margin-top: 50px; display: flex; justify-content: space-around; width: 100%;">
+                            <div style="text-align: center; width: 250px;">
+                                <p style="font-weight: bold; font-size: 16pt; margin-bottom: 15px;">معتمد التقرير</p>
+                                <div style="min-height: 80px; display: flex; justify-content: center; align-items: center;">
+                                    ${approverSignature}
+                                </div>
+                            </div>
+
+                            <div style="text-align: center; width: 250px;">
+                                <p style="font-weight: bold; font-size: 16pt; margin-bottom: 15px;">مشرف الموقع</p>
+                                <div style="min-height: 80px; display: flex; justify-content: center; align-items: center;">
+                                    ${supervisorSignature}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                pageDiv.innerHTML = headerHTML + contentHTML + footerHTML;
+                pdfTemplate.appendChild(pageDiv);
+            };
+
+            // تقسيم الجدول إلى صفحات إذا كان كبيراً
+            const rows = tableClone.querySelectorAll('tbody tr');
+            const rowsPerPage = 15; // عدد الصفوف في كل صفحة
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+            
+            for (let page = 1; page <= totalPages; page++) {
+                const startIndex = (page - 1) * rowsPerPage;
+                const endIndex = Math.min(startIndex + rowsPerPage, rows.length);
+                
+                // إنشاء جدول جديد للصفحة الحالية
+                const pageTable = document.createElement('table');
+                pageTable.style.width = "100%";
+                pageTable.style.fontSize = "10px";
+                pageTable.style.borderCollapse = "collapse";
+                pageTable.style.fontFamily = "'Cairo', sans-serif";
+                
+                // نسخ الهيدر
+                const headerClone = tableClone.querySelector('thead').cloneNode(true);
+                pageTable.appendChild(headerClone);
+                
+                // إضافة الصفوف للصفحة الحالية
+                const tbody = document.createElement('tbody');
+                for (let i = startIndex; i < endIndex; i++) {
+                    tbody.appendChild(rows[i].cloneNode(true));
+                }
+                pageTable.appendChild(tbody);
+                
+                // إنشاء الصفحة
+                createPDFPage(pageTable.outerHTML, page, totalPages);
+            }
+
+            pdfTemplate.style.display = 'block'; 
             
             const opt = {
                 margin: 0.2,
@@ -1212,8 +1278,8 @@
                 }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.style.display = 'none'; 
+            html2pdf().set(opt).from(pdfTemplate).save().then(() => {
+                pdfTemplate.style.display = 'none'; 
                 showToast('تم تصدير التقرير بنجاح', 'success');
             });
         }
@@ -1232,35 +1298,47 @@
             // تهيئة لوحة توقيع المستخدم
             userSignatureCanvas = document.getElementById('user-signature-canvas');
             userSignatureCtx = userSignatureCanvas.getContext('2d');
-            userSignatureCanvas.width = userSignatureCanvas.offsetWidth;
-            userSignatureCanvas.height = userSignatureCanvas.offsetHeight;
+            userSignatureCanvas.width = userSignatureCanvas.offsetWidth * 2;
+            userSignatureCanvas.height = userSignatureCanvas.offsetHeight * 2;
+            userSignatureCanvas.style.width = userSignatureCanvas.offsetWidth + 'px';
+            userSignatureCanvas.style.height = userSignatureCanvas.offsetHeight + 'px';
+            userSignatureCtx.scale(2, 2);
             userSignatureCtx.fillStyle = 'white';
             userSignatureCtx.fillRect(0, 0, userSignatureCanvas.width, userSignatureCanvas.height);
             userSignatureCtx.strokeStyle = '#000';
             userSignatureCtx.lineWidth = 2;
             userSignatureCtx.lineCap = 'round';
+            userSignatureCtx.lineJoin = 'round';
 
             // تهيئة لوحة توقيع الموظف
             employeeSignatureCanvas = document.getElementById('employee-signature-canvas');
             employeeSignatureCtx = employeeSignatureCanvas.getContext('2d');
-            employeeSignatureCanvas.width = employeeSignatureCanvas.offsetWidth;
-            employeeSignatureCanvas.height = employeeSignatureCanvas.offsetHeight;
+            employeeSignatureCanvas.width = employeeSignatureCanvas.offsetWidth * 2;
+            employeeSignatureCanvas.height = employeeSignatureCanvas.offsetHeight * 2;
+            employeeSignatureCanvas.style.width = employeeSignatureCanvas.offsetWidth + 'px';
+            employeeSignatureCanvas.style.height = employeeSignatureCanvas.offsetHeight + 'px';
+            employeeSignatureCtx.scale(2, 2);
             employeeSignatureCtx.fillStyle = 'white';
             employeeSignatureCtx.fillRect(0, 0, employeeSignatureCanvas.width, employeeSignatureCanvas.height);
             employeeSignatureCtx.strokeStyle = '#000';
             employeeSignatureCtx.lineWidth = 2;
             employeeSignatureCtx.lineCap = 'round';
+            employeeSignatureCtx.lineJoin = 'round';
 
             // تهيئة لوحة توقيع المودال
             modalSignatureCanvas = document.getElementById('modal-signature-canvas');
             modalSignatureCtx = modalSignatureCanvas.getContext('2d');
-            modalSignatureCanvas.width = modalSignatureCanvas.offsetWidth;
-            modalSignatureCanvas.height = modalSignatureCanvas.offsetHeight;
+            modalSignatureCanvas.width = modalSignatureCanvas.offsetWidth * 2;
+            modalSignatureCanvas.height = modalSignatureCanvas.offsetHeight * 2;
+            modalSignatureCanvas.style.width = modalSignatureCanvas.offsetWidth + 'px';
+            modalSignatureCanvas.style.height = modalSignatureCanvas.offsetHeight + 'px';
+            modalSignatureCtx.scale(2, 2);
             modalSignatureCtx.fillStyle = 'white';
             modalSignatureCtx.fillRect(0, 0, modalSignatureCanvas.width, modalSignatureCanvas.height);
             modalSignatureCtx.strokeStyle = '#000';
             modalSignatureCtx.lineWidth = 2;
             modalSignatureCtx.lineCap = 'round';
+            modalSignatureCtx.lineJoin = 'round';
 
             // إضافة مستمعي الأحداث للوحة توقيع المستخدم
             setupCanvasEvents(userSignatureCanvas, userSignatureCtx, 'user');
@@ -1291,8 +1369,8 @@
                 }
                 
                 return {
-                    x: clientX - rect.left,
-                    y: clientY - rect.top
+                    x: (clientX - rect.left) * (canvas.width / rect.width / 2),
+                    y: (clientY - rect.top) * (canvas.height / rect.height / 2)
                 };
             };
 
