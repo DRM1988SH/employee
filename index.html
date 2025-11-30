@@ -1,1352 +1,1556 @@
-‏<!DOCTYPE html>
-‏<html lang="ar" dir="rtl">
-‏<head>
-‏    <meta charset="UTF-8">
-‏    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-‏    <title>نظام الحضور - شركة الجزيرة الخضراء</title>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الحضور - شركة الجزيرة الخضراء</title>
     
-‏    <script src="https://cdn.tailwindcss.com"></script>
-‏    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=PT+Serif:wght@400;700&display=swap" rel="stylesheet">
-‏    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-‏    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=PT+Serif:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-‏    <style>
-‏        :root {
-‏            --header-height: 60px;
-‏            --footer-height: 40px;
-‏            --main-green: #dcfce7;
-‏            --dark-green: #166534;
-        }
-
-‏        body {
-‏            font-family: 'Cairo', sans-serif;
-‏            margin: 0;
-‏            padding: 0;
-‏            background-color: #f3f4f6;
-‏            height: 100vh;
-‏            display: flex;
-‏            flex-direction: column;
-‏            overflow: hidden;
+    <style>
+        :root {
+            --header-height: 60px;
+            --footer-height: 40px;
+            --main-green: #dcfce7;
+            --dark-green: #166534;
         }
 
-‏        header {
-‏            height: var(--header-height);
-‏            background-color: var(--main-green);
-‏            flex-shrink: 0;
-‏            display: flex;
-‏            align-items: center;
-‏            padding: 0 20px;
-‏            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-‏            z-index: 50;
-‏            position: fixed;
-‏            top: 0;
-‏            left: 0;
-‏            right: 0;
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-‏        footer {
-‏            height: var(--footer-height);
-‏            background-color: #e5e7eb;
-‏            flex-shrink: 0;
-‏            font-size: 12px;
-‏            display: flex;
-‏            justify-content: space-between;
-‏            align-items: center;
-‏            padding: 0 20px;
-‏            border-top: 1px solid #ccc;
-‏            z-index: 50;
-‏            position: fixed;
-‏            bottom: 0;
-‏            left: 0;
-‏            right: 0;
+        header {
+            height: var(--header-height);
+            background-color: var(--main-green);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 50;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
         }
 
-‏        #app-container {
-‏            flex-grow: 1;
-‏            display: flex;
-‏            overflow: hidden;
-‏            height: calc(100vh - var(--header-height) - var(--footer-height));
-‏            margin-top: var(--header-height);
-‏            margin-bottom: var(--footer-height);
+        footer {
+            height: var(--footer-height);
+            background-color: #e5e7eb;
+            flex-shrink: 0;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-top: 1px solid #ccc;
+            z-index: 50;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
         }
 
-‏        aside {
-‏            width: 250px;
-‏            background-color: #ffffff;
-‏            border-left: 1px solid #e5e7eb;
-‏            display: flex;
-‏            flex-direction: column;
-‏            transition: transform 0.3s ease;
-‏            overflow-y: auto;
-‏            flex-shrink: 0;
+        #app-container {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+            height: calc(100vh - var(--header-height) - var(--footer-height));
+            margin-top: var(--header-height);
+            margin-bottom: var(--footer-height);
         }
 
-‏        main {
-‏            flex-grow: 1;
-‏            overflow-y: auto;
-‏            padding: 20px;
-‏            background-color: #f8fafc;
-‏            position: relative;
+        aside {
+            width: 250px;
+            background-color: #ffffff;
+            border-left: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
-‏        .attendance-table {
-‏            width: 100%;
-‏            border-collapse: collapse;
-‏            font-size: 0.85rem;
-‏            background: white;
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #f8fafc;
+            position: relative;
         }
-‏        .attendance-table th, .attendance-table td {
-‏            border: 1px solid #cbd5e1;
-‏            padding: 2px;
-‏            text-align: center;
-‏            vertical-align: middle;
-‏            height: 35px;
+
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            background: white;
         }
-‏        .attendance-table th {
-‏            background-color: #f1f5f9;
-‏            font-weight: bold;
-‏            white-space: nowrap;
+        .attendance-table th, .attendance-table td {
+            border: 1px solid #cbd5e1;
+            padding: 2px;
+            text-align: center;
+            vertical-align: middle;
+            height: 35px;
+        }
+        .attendance-table th {
+            background-color: #f1f5f9;
+            font-weight: bold;
+            white-space: nowrap;
         }
         
-‏        .attendance-select {
-‏            width: 100%;
-‏            height: 100%;
-‏            border: none;
-‏            text-align: center;
-‏            background-color: transparent;
-‏            cursor: pointer;
-‏            font-weight: bold;
-‏            color: #374151;
-‏            -webkit-appearance: none; 
-‏            -moz-appearance: none;
-‏            appearance: none;
+        .attendance-select {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            background-color: transparent;
+            cursor: pointer;
+            font-weight: bold;
+            color: #374151;
+            -webkit-appearance: none; 
+            -moz-appearance: none;
+            appearance: none;
         }
-‏        .attendance-select:hover {
-‏            background-color: #f0fdf4; 
+        .attendance-select:hover {
+            background-color: #f0fdf4; 
         }
-‏        .attendance-select:focus {
-‏            outline: 2px solid #22c55e;
-‏            background-color: #fff;
+        .attendance-select:focus {
+            outline: 2px solid #22c55e;
+            background-color: #fff;
         }
         
-‏        #login-overlay {
-‏            position: fixed;
-‏            top: 0;
-‏            left: 0;
-‏            width: 100%;
-‏            height: 100%;
-‏            background: #f0fdf4;
-‏            z-index: 1000;
-‏            display: flex;
-‏            justify-content: center;
-‏            align-items: center;
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f0fdf4;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-‏        @media (max-width: 768px) {
-‏            aside {
-‏                position: fixed;
-‏                height: 100%;
-‏                z-index: 40;
-‏                transform: translateX(100%);
-‏                top: var(--header-height);
-‏                bottom: var(--footer-height);
+        @media (max-width: 768px) {
+            aside {
+                position: fixed;
+                height: 100%;
+                z-index: 40;
+                transform: translateX(100%);
+                top: var(--header-height);
+                bottom: var(--footer-height);
             }
-‏            aside.open {
-‏                transform: translateX(0);
+            aside.open {
+                transform: translateX(0);
             }
         }
 
-‏        #toast-container {
-‏            min-width: 250px;
-‏            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        #toast-container {
+            min-width: 250px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-‏        .signature-canvas {
-‏            border: 1px solid #ccc;
-‏            background-color: white;
-‏            cursor: crosshair;
-‏            width: 100%;
-‏            height: 150px;
-‏            touch-action: none;
+        .signature-canvas {
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: crosshair;
+            width: 100%;
+            height: 150px;
+            touch-action: none;
         }
-‏        .signature-pad {
-‏            position: relative;
-‏            width: 100%;
-‏            height: 150px;
-‏            background: white;
+        .signature-pad {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            background: white;
         }
-‏        .signature-clear {
-‏            position: absolute;
-‏            top: 5px;
-‏            left: 5px;
-‏            background: rgba(255,255,255,0.9);
-‏            border: 1px solid #ccc;
-‏            border-radius: 3px;
-‏            padding: 5px 10px;
-‏            font-size: 12px;
-‏            cursor: pointer;
-‏            z-index: 10;
+        .signature-clear {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 10;
         }
         
-‏        .modal {
-‏            display: none;
-‏            position: fixed;
-‏            top: 0;
-‏            left: 0;
-‏            width: 100%;
-‏            height: 100%;
-‏            background-color: rgba(0,0,0,0.5);
-‏            z-index: 2000;
-‏            justify-content: center;
-‏            align-items: center;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
         }
-‏        .modal-content {
-‏            background-color: white;
-‏            padding: 20px;
-‏            border-radius: 8px;
-‏            width: 90%;
-‏            max-width: 500px;
-‏            max-height: 90vh;
-‏            overflow-y: auto;
-        }
-        
-‏        .signature-dropdown {
-‏            position: relative;
-‏            display: inline-block;
-        }
-‏        .signature-dropdown-content {
-‏            display: none;
-‏            position: absolute;
-‏            background-color: white;
-‏            min-width: 300px;
-‏            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-‏            z-index: 1;
-‏            padding: 10px;
-‏            border-radius: 5px;
-‏            right: 0;
-‏            top: 100%;
-        }
-‏        .signature-dropdown:hover .signature-dropdown-content {
-‏            display: block;
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
-‏        .attendance-days {
-‏            font-weight: bold;
-‏            color: #166534;
+        .attendance-days {
+            font-weight: bold;
+            color: #166534;
         }
 
-‏        .signature-image {
-‏            max-height: 40px;
-‏            max-width: 120px;
-‏            object-fit: contain;
-‏            border: 1px solid #ddd;
-‏            border-radius: 4px;
-‏            padding: 2px;
-‏            background: white;
+        .signature-image {
+            max-height: 40px;
+            max-width: 120px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 2px;
+            background: white;
         }
 
-‏        .pdf-page {
-‏            position: relative;
-‏            min-height: 100vh;
-‏            padding: 20px;
-‏            direction: rtl;
-‏            font-family: 'Cairo', sans-serif;
-‏            page-break-after: always;
-        }
-        
-‏        .pdf-footer {
-‏            position: absolute;
-‏            bottom: 0;
-‏            left: 0;
-‏            right: 0;
-‏            height: 40px;
-‏            border-top: 1px solid #ccc;
-‏            padding: 10px 20px;
-‏            display: flex;
-‏            justify-content: space-between;
-‏            align-items: center;
-‏            font-size: 12px;
-‏            background: white;
-‏            box-sizing: border-box;
-        }
-        
-‏        .pdf-header {
-‏            margin-bottom: 30px;
-‏            border-bottom: 2px solid #000;
-‏            padding-bottom: 10px;
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
-‏        .logout-btn {
-‏            background: #dc2626;
-‏            color: white;
-‏            border: none;
-‏            padding: 8px 16px;
-‏            border-radius: 4px;
-‏            cursor: pointer;
-‏            font-weight: bold;
+        .logout-btn:hover {
+            background: #b91c1c;
         }
 
-‏        .logout-btn:hover {
-‏            background: #b91c1c;
+        .screen {
+            display: none;
         }
-‏    </style>
-‏</head>
-‏<body>
+        .screen.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
 
-‏    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[3000] transition-opacity duration-300 opacity-0 pointer-events-none">
-‏        <div id="toast-message" class="rounded-lg shadow-xl p-4 text-white font-semibold"></div>
-‏    </div>
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[3000] transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div id="toast-message" class="rounded-lg shadow-xl p-4 text-white font-semibold"></div>
+    </div>
 
-‏    <div id="login-overlay">
-‏        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm border-t-4 border-green-600">
-‏            <h2 class="text-2xl font-bold mb-6 text-green-800 text-center">تسجيل الدخول</h2>
-‏            <div class="mb-4">
-‏                <label class="block text-gray-700 text-sm font-bold mb-2">الرقم الوظيفي</label>
-‏                <input type="number" id="login-id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="أدخل الرقم الوظيفي">
-‏            </div>
-‏            <button onclick="login()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition">
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-overlay">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm border-t-4 border-green-600">
+            <h2 class="text-2xl font-bold mb-6 text-green-800 text-center">تسجيل الدخول</h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">الرقم الوظيفي</label>
+                <input type="number" id="login-id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="أدخل الرقم الوظيفي">
+            </div>
+            <button onclick="login()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition">
                 دخول
-‏            </button>
-‏            <p class="mt-4 text-xs text-gray-500 text-center">
+            </button>
+            <p class="mt-4 text-xs text-gray-500 text-center">
                 مدير النظام: 600 | معتمد: 500 <br> مشرف: 400 | عقد: 100
-‏            </p>
-‏        </div>
-‏    </div>
+            </p>
+        </div>
+    </div>
 
-‏    <header>
-‏        <div class="flex items-center">
-‏            <button id="menu-toggle" class="md:hidden text-green-800 text-xl ml-4">
-‏                <i class="fas fa-bars"></i>
-‏            </button>
-‏            <h1 class="text-xl font-bold text-green-800">نظام الحضور والانصراف</h1>
-‏        </div>
-‏        <div class="flex items-center gap-4">
-‏            <span id="user-display" class="font-bold text-sm text-gray-700"></span>
-‏            <button onclick="logout()" class="logout-btn hidden" id="logout-btn">
-‏                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-‏            </button>
-‏        </div>
-‏    </header>
+    <header>
+        <div class="flex items-center">
+            <button id="menu-toggle" class="md:hidden text-green-800 text-xl ml-4">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold text-green-800">نظام الحضور والانصراف</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="user-display" class="font-bold text-sm text-gray-700"></span>
+            <button onclick="logout()" class="logout-btn hidden" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </button>
+        </div>
+    </header>
 
-‏    <div id="app-container">
-‏        <aside id="sidebar">
-‏            <div class="p-4 flex flex-col items-center border-b">
-‏                <img id="sidebar-logo" src="" alt="شعار الشركة" class="w-[200px] h-[200px] object-contain mb-2 bg-gray-50 rounded hidden">
-‏                <div id="no-logo-text" class="w-[200px] h-[200px] flex items-center justify-center bg-gray-200 text-gray-400 rounded mb-2">
+    <div id="app-container">
+        <aside id="sidebar">
+            <div class="p-4 flex flex-col items-center border-b">
+                <img id="sidebar-logo" src="" alt="شعار الشركة" class="w-[200px] h-[200px] object-contain mb-2 bg-gray-50 rounded hidden">
+                <div id="no-logo-text" class="w-[200px] h-[200px] flex items-center justify-center bg-gray-200 text-gray-400 rounded mb-2">
                     لا يوجد شعار
-‏                </div>
-‏            </div>
-‏            <nav class="flex-grow p-2">
-‏                <button onclick="showScreen('attendance')" class="w-full text-right p-3 mb-2 rounded hover:bg-green-50 text-gray-700 font-semibold flex items-center gap-2">
-‏                    <i class="fas fa-calendar-check"></i> تسجيل الحضور
-‏                </button>
-‏                <button onclick="showScreen('settings')" id="nav-settings" class="w-full text-right p-3 mb-2 rounded hover:bg-green-50 text-gray-700 font-semibold flex items-center gap-2 hidden">
-‏                    <i class="fas fa-cogs"></i> الإعدادات
-‏                </button>
-‏            </nav>
-‏        </aside>
+                </div>
+            </div>
+            <nav class="flex-grow p-2">
+                <button onclick="showScreen('attendance')" class="w-full text-right p-3 mb-2 rounded hover:bg-green-50 text-gray-700 font-semibold flex items-center gap-2">
+                    <i class="fas fa-calendar-check"></i> تسجيل الحضور
+                </button>
+                <button onclick="showScreen('reports')" class="w-full text-right p-3 mb-2 rounded hover:bg-green-50 text-gray-700 font-semibold flex items-center gap-2">
+                    <i class="fas fa-chart-bar"></i> التقارير
+                </button>
+                <button onclick="showScreen('settings')" id="nav-settings" class="w-full text-right p-3 mb-2 rounded hover:bg-green-50 text-gray-700 font-semibold flex items-center gap-2 hidden">
+                    <i class="fas fa-cogs"></i> الإعدادات
+                </button>
+            </nav>
+        </aside>
 
-‏        <main>
+        <main>
             <!-- شاشة الحضور -->
-‏            <div id="screen-attendance" class="h-full flex flex-col">
-‏                <div class="mb-6 text-center">
-‏                    <h2 class="text-2xl font-bold text-green-800">شركة الجزيرة الخضراء للمواشي والاغنام</h2>
-‏                    <h3 id="current-site-name" class="text-xl text-gray-600 mt-1">-- اختر الموقع --</h3>
-‏                    <p class="text-xs text-gray-500 mt-1">P: حضور | A: غياب | V: إجازة</p>
-‏                </div>
+            <div id="screen-attendance" class="screen active h-full flex flex-col">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl font-bold text-green-800">شركة الجزيرة الخضراء للمواشي والاغنام</h2>
+                    <h3 id="current-site-name" class="text-xl text-gray-600 mt-1">-- اختر الموقع --</h3>
+                    <p class="text-xs text-gray-500 mt-1">P: حضور | A: غياب | V: إجازة</p>
+                </div>
 
-‏                <div class="bg-white p-4 rounded shadow mb-4 flex flex-wrap gap-4 items-end justify-between">
-‏                    <div class="flex gap-4 flex-wrap">
-‏                        <div>
-‏                            <label class="block text-sm font-bold mb-1">الموقع (المسلخ)</label>
-‏                            <select id="site-select" onchange="loadAttendanceTable()" class="border p-2 rounded w-64 bg-gray-50">
-‏                                <option value="">-- اختر المسلخ --</option>
-‏                            </select>
-‏                        </div>
-‏                        <div>
-‏                            <label class="block text-sm font-bold mb-1">الشهر والسنة</label>
-‏                            <input type="month" id="month-picker" onchange="loadAttendanceTable()" class="border p-2 rounded bg-gray-50">
-‏                        </div>
-‏                    </div>
+                <div class="bg-white p-4 rounded shadow mb-4 flex flex-wrap gap-4 items-end justify-between">
+                    <div class="flex gap-4 flex-wrap">
+                        <div>
+                            <label class="block text-sm font-bold mb-1">الموقع (المسلخ)</label>
+                            <select id="site-select" onchange="loadAttendanceTable()" class="border p-2 rounded w-64 bg-gray-50">
+                                <option value="">-- اختر المسلخ --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-1">الشهر والسنة</label>
+                            <input type="month" id="month-picker" onchange="loadAttendanceTable()" class="border p-2 rounded bg-gray-50">
+                        </div>
+                    </div>
                     
-‏                    <div class="flex gap-2">
-‏                        <button onclick="saveAttendance()" id="btn-save" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">
-‏                            <i class="fas fa-save"></i> حفظ التقرير
-‏                        </button>
+                    <div class="flex gap-2">
+                        <button onclick="saveAttendance()" id="btn-save" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">
+                            <i class="fas fa-save"></i> حفظ التقرير
+                        </button>
                         
-‏                        <button onclick="approveReport('supervisor')" id="btn-approve-sup" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 hidden">
-‏                            <i class="fas fa-check"></i> اعتماد مشرف
-‏                        </button>
+                        <button onclick="approveReport('supervisor')" id="btn-approve-sup" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 hidden">
+                            <i class="fas fa-check"></i> اعتماد مشرف
+                        </button>
                         
-‏                        <button onclick="approveReport('approver')" id="btn-approve-app" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 hidden">
-‏                            <i class="fas fa-check-double"></i> اعتماد نهائي
-‏                        </button>
+                        <button onclick="approveReport('approver')" id="btn-approve-app" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 hidden">
+                            <i class="fas fa-check-double"></i> اعتماد نهائي
+                        </button>
 
-‏                        <button onclick="exportToPDF()" id="btn-export" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-‏                            <i class="fas fa-file-pdf"></i> تصدير PDF
-‏                        </button>
-‏                    </div>
-‏                </div>
+                        <button onclick="exportToPDF()" id="btn-export" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                            <i class="fas fa-file-pdf"></i> تصدير PDF
+                        </button>
+                    </div>
+                </div>
 
-‏                <div class="flex-grow overflow-auto bg-white rounded shadow relative">
-‏                    <div id="attendance-status-bar" class="p-2 text-sm border-b hidden">
-‏                    </div>
-‏                    <div class="overflow-x-auto">
-‏                        <table class="attendance-table" id="main-table">
-‏                            <thead>
-‏                                <tr id="table-header-row">
-‏                                </tr>
-‏                            </thead>
-‏                            <tbody id="table-body">
-‏                            </tbody>
-‏                        </table>
-‏                    </div>
-‏                </div>
-‏            </div>
+                <div class="flex-grow overflow-auto bg-white rounded shadow relative">
+                    <div id="attendance-status-bar" class="p-2 text-sm border-b hidden">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="attendance-table" id="main-table">
+                            <thead>
+                                <tr id="table-header-row">
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- شاشة التقارير -->
+            <div id="screen-reports" class="screen h-full flex flex-col">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl font-bold text-green-800">التقارير والإحصائيات</h2>
+                    <p class="text-sm text-gray-600 mt-1">عرض تقارير الحضور والانصراف</p>
+                </div>
+
+                <div class="bg-white p-4 rounded shadow mb-4">
+                    <div class="flex gap-4 flex-wrap">
+                        <div>
+                            <label class="block text-sm font-bold mb-1">الموقع</label>
+                            <select id="report-site-select" class="border p-2 rounded w-64 bg-gray-50">
+                                <option value="">جميع المواقع</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-1">الفترة</label>
+                            <input type="month" id="report-month" class="border p-2 rounded bg-gray-50">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="generateReport()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                                <i class="fas fa-chart-bar"></i> إنشاء التقرير
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded shadow text-center">
+                        <div class="text-3xl font-bold text-blue-600" id="total-employees">0</div>
+                        <div class="text-gray-600">إجمالي الموظفين</div>
+                    </div>
+                    <div class="bg-white p-4 rounded shadow text-center">
+                        <div class="text-3xl font-bold text-green-600" id="attendance-rate">0%</div>
+                        <div class="text-gray-600">نسبة الحضور</div>
+                    </div>
+                    <div class="bg-white p-4 rounded shadow text-center">
+                        <div class="text-3xl font-bold text-red-600" id="absence-rate">0%</div>
+                        <div class="text-gray-600">نسبة الغياب</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded shadow flex-grow">
+                    <div class="p-4 border-b">
+                        <h3 class="font-bold text-lg">تفاصيل التقرير</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm" id="report-table">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 text-right">الموظف</th>
+                                    <th class="p-3 text-right">الموقع</th>
+                                    <th class="p-3">أيام الحضور</th>
+                                    <th class="p-3">أيام الغياب</th>
+                                    <th class="p-3">الإجازات</th>
+                                    <th class="p-3">نسبة الحضور</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-body">
+                                <tr>
+                                    <td colspan="6" class="p-4 text-center text-gray-500">اختر الموقع والفترة لعرض التقرير</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <!-- شاشة الإعدادات -->
-‏            <div id="screen-settings" class="hidden">
-‏                <h2 class="text-2xl font-bold mb-4 text-gray-800 border-b pb-2">الإعدادات (مدير النظام)</h2>
+            <div id="screen-settings" class="screen h-full flex flex-col">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 border-b pb-2">الإعدادات (مدير النظام)</h2>
                 
-‏                <div class="bg-white p-4 rounded shadow mb-6">
-‏                    <h3 class="font-bold text-lg mb-3 text-green-700">شعار النظام والتقارير</h3>
-‏                    <input type="file" id="logo-upload" accept="image/*" class="mb-2" onchange="handleLogoUpload(this)">
-‏                    <p class="text-xs text-gray-500">يفضل صورة مربعة 200x200</p>
-‏                </div>
+                <div class="bg-white p-4 rounded shadow mb-6">
+                    <h3 class="font-bold text-lg mb-3 text-green-700">شعار النظام والتقارير</h3>
+                    <input type="file" id="logo-upload" accept="image/*" class="mb-2" onchange="handleLogoUpload(this)">
+                    <p class="text-xs text-gray-500">يفضل صورة مربعة 200x200</p>
+                </div>
 
-‏                <div class="bg-white p-4 rounded shadow mb-6">
-‏                    <h3 class="font-bold text-lg mb-3 text-red-700">إعادة ضبط النظام</h3>
-‏                    <p class="text-sm text-gray-600 mb-3">هذا الإجراء سيمسح جميع البيانات ويعيد النظام إلى ضبط المصنع.</p>
-‏                    <button onclick="resetSystem()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
-‏                        <i class="fas fa-trash-alt"></i> إعادة ضبط النظام
-‏                    </button>
-‏                </div>
+                <div class="bg-white p-4 rounded shadow mb-6">
+                    <h3 class="font-bold text-lg mb-3 text-red-700">إعادة ضبط النظام</h3>
+                    <p class="text-sm text-gray-600 mb-3">هذا الإجراء سيمسح جميع البيانات ويعيد النظام إلى ضبط المصنع.</p>
+                    <button onclick="resetSystem()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+                        <i class="fas fa-trash-alt"></i> إعادة ضبط النظام
+                    </button>
+                </div>
 
-‏                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- إدارة المستخدمين -->
-‏                    <div class="bg-white p-4 rounded shadow">
-‏                        <h3 class="font-bold text-lg mb-3 text-green-700">إدارة المستخدمين</h3>
-‏                        <div class="bg-gray-50 p-3 rounded mb-4 border">
-‏                            <label class="block text-sm font-bold mb-1">بيانات المستخدم الجديد:</label>
-‏                            <input type="text" id="new-user-name" placeholder="اسم المستخدم" class="border p-2 rounded w-full mb-2">
-‏                            <div class="flex gap-2 mb-2">
-‏                                <input type="number" id="new-user-id" placeholder="الرقم الوظيفي" class="border p-2 rounded w-1/2">
-‏                                <select id="new-user-role" class="border p-2 rounded w-1/2">
-‏                                    <option value="contract_manager">مدير العقد</option>
-‏                                    <option value="supervisor">مشرف الموقع</option>
-‏                                    <option value="approver">معتمد التقارير</option>
-‏                                    <option value="admin">مدير النظام</option>
-‏                                </select>
-‏                            </div>
+                    <div class="bg-white p-4 rounded shadow">
+                        <h3 class="font-bold text-lg mb-3 text-green-700">إدارة المستخدمين</h3>
+                        <div class="bg-gray-50 p-3 rounded mb-4 border">
+                            <label class="block text-sm font-bold mb-1">بيانات المستخدم الجديد:</label>
+                            <input type="text" id="new-user-name" placeholder="اسم المستخدم" class="border p-2 rounded w-full mb-2">
+                            <div class="flex gap-2 mb-2">
+                                <input type="number" id="new-user-id" placeholder="الرقم الوظيفي" class="border p-2 rounded w-1/2">
+                                <select id="new-user-role" class="border p-2 rounded w-1/2">
+                                    <option value="contract_manager">مدير العقد</option>
+                                    <option value="supervisor">مشرف الموقع</option>
+                                    <option value="approver">معتمد التقارير</option>
+                                    <option value="admin">مدير النظام</option>
+                                </select>
+                            </div>
                             
-‏                            <div class="mb-2">
-‏                                <label class="block text-sm mb-1">التوقيع الرقمي:</label>
-‏                                <div class="signature-pad">
-‏                                    <canvas id="user-signature-canvas" class="signature-canvas"></canvas>
-‏                                    <button type="button" id="clear-user-signature" class="signature-clear">مسح التوقيع</button>
-‏                                </div>
-‏                            </div>
+                            <div class="mb-2">
+                                <label class="block text-sm mb-1">التوقيع الرقمي:</label>
+                                <div class="signature-pad">
+                                    <canvas id="user-signature-canvas" class="signature-canvas"></canvas>
+                                    <button type="button" id="clear-user-signature" class="signature-clear">مسح التوقيع</button>
+                                </div>
+                            </div>
                             
-‏                            <button onclick="addUser()" class="bg-gray-800 text-white w-full py-2 rounded hover:bg-gray-900 transition">
+                            <button onclick="addUser()" class="bg-gray-800 text-white w-full py-2 rounded hover:bg-gray-900 transition">
                                 إضافة المستخدم
-‏                            </button>
-‏                        </div>
+                            </button>
+                        </div>
 
-‏                        <h4 class="font-bold text-sm mb-2">قائمة المستخدمين:</h4>
-‏                        <div class="overflow-y-auto max-h-48 border rounded bg-white">
-‏                            <table class="w-full text-sm">
-‏                                <thead class="bg-gray-100 sticky top-0">
-‏                                    <tr>
-‏                                        <th class="p-2 text-right">الاسم</th>
-‏                                        <th class="p-2 text-right">الدور</th>
-‏                                        <th class="p-2 text-right">الرقم</th>
-‏                                        <th class="p-2">توقيع</th>
-‏                                        <th class="p-2">حذف</th>
-‏                                    </tr>
-‏                                </thead>
-‏                                <tbody id="users-table-body">
-                                    <!-- سيتم ملؤها ديناميكياً -->
-‏                                </tbody>
-‏                            </table>
-‏                        </div>
-‏                    </div>
+                        <h4 class="font-bold text-sm mb-2">قائمة المستخدمين:</h4>
+                        <div class="overflow-y-auto max-h-48 border rounded bg-white">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="p-2 text-right">الاسم</th>
+                                        <th class="p-2 text-right">الدور</th>
+                                        <th class="p-2 text-right">الرقم</th>
+                                        <th class="p-2">توقيع</th>
+                                        <th class="p-2">حذف</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
                     <!-- إدارة المواقع والموظفين -->
-‏                    <div class="bg-white p-4 rounded shadow">
-‏                        <h3 class="font-bold text-lg mb-3 text-green-700">إدارة المواقع</h3>
-‏                        <div class="flex gap-2 mb-4">
-‏                            <input type="text" id="new-site-name" placeholder="اسم المسلخ" class="border p-2 rounded flex-grow">
-‏                            <button onclick="addSite()" class="bg-green-600 text-white px-4 py-2 rounded">إضافة موقع</button>
-‏                        </div>
+                    <div class="bg-white p-4 rounded shadow">
+                        <h3 class="font-bold text-lg mb-3 text-green-700">إدارة المواقع</h3>
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="new-site-name" placeholder="اسم المسلخ" class="border p-2 rounded flex-grow">
+                            <button onclick="addSite()" class="bg-green-600 text-white px-4 py-2 rounded">إضافة موقع</button>
+                        </div>
                         
-‏                        <div class="border-t pt-4">
-‏                            <h4 class="font-bold mb-2">إضافة موظف للموقع:</h4>
-‏                            <select id="settings-site-select" class="w-full border p-2 rounded mb-2" onchange="loadSiteEmployees()">
-‏                                <option value="">اختر الموقع أولاً</option>
-‏                            </select>
-‏                            <input type="text" id="emp-name" placeholder="اسم الموظف" class="w-full border p-2 rounded mb-2">
-‏                            <select id="emp-role" class="w-full border p-2 rounded mb-2">
-‏                                <option value="مشرف المسلخ">مشرف المسلخ</option>
-‏                                <option value="مشرف نظافة">مشرف نظافة</option>
-‏                                <option value="محاسب">محاسب</option>
-‏                                <option value="قصاب">قصاب</option>
-‏                                <option value="عامل نظافة">عامل نظافة</option>
-‏                                <option value="حمال">حمال</option>
-‏                            </select>
+                        <div class="border-t pt-4">
+                            <h4 class="font-bold mb-2">إضافة موظف للموقع:</h4>
+                            <select id="settings-site-select" class="w-full border p-2 rounded mb-2" onchange="loadSiteEmployees()">
+                                <option value="">اختر الموقع أولاً</option>
+                            </select>
+                            <input type="text" id="emp-name" placeholder="اسم الموظف" class="w-full border p-2 rounded mb-2">
+                            <select id="emp-role" class="w-full border p-2 rounded mb-2">
+                                <option value="مشرف المسلخ">مشرف المسلخ</option>
+                                <option value="مشرف نظافة">مشرف نظافة</option>
+                                <option value="محاسب">محاسب</option>
+                                <option value="قصاب">قصاب</option>
+                                <option value="عامل نظافة">عامل نظافة</option>
+                                <option value="حمال">حمال</option>
+                            </select>
                             
-‏                            <div class="mb-2">
-‏                                <label class="block text-sm mb-1">التوقيع الرقمي:</label>
-‏                                <div class="signature-pad">
-‏                                    <canvas id="employee-signature-canvas" class="signature-canvas"></canvas>
-‏                                    <button type="button" id="clear-employee-signature" class="signature-clear">مسح التوقيع</button>
-‏                                </div>
-‏                            </div>
+                            <div class="mb-2">
+                                <label class="block text-sm mb-1">التوقيع الرقمي:</label>
+                                <div class="signature-pad">
+                                    <canvas id="employee-signature-canvas" class="signature-canvas"></canvas>
+                                    <button type="button" id="clear-employee-signature" class="signature-clear">مسح التوقيع</button>
+                                </div>
+                            </div>
                             
-‏                            <button onclick="addEmployee()" class="w-full bg-blue-600 text-white py-2 rounded mt-2">
+                            <button onclick="addEmployee()" class="w-full bg-blue-600 text-white py-2 rounded mt-2">
                                 إضافة الموظف
-‏                            </button>
-‏                        </div>
+                            </button>
+                        </div>
 
-‏                        <div class="border-t pt-4 mt-4">
-‏                            <h4 class="font-bold mb-2">موظفو الموقع المحدد:</h4>
-‏                            <div class="overflow-y-auto max-h-48 border rounded bg-white">
-‏                                <table class="w-full text-sm">
-‏                                    <thead class="bg-gray-100 sticky top-0">
-‏                                        <tr>
-‏                                            <th class="p-2 text-right">الاسم</th>
-‏                                            <th class="p-2 text-right">الوظيفة</th>
-‏                                            <th class="p-2">توقيع</th>
-‏                                            <th class="p-2">حذف</th>
-‏                                        </tr>
-‏                                    </thead>
-‏                                    <tbody id="site-employees-body">
-                                        <!-- سيتم ملؤها ديناميكياً -->
-‏                                    </tbody>
-‏                                </table>
-‏                            </div>
-‏                        </div>
-‏                    </div>
-‏                </div>
-‏            </div>
-‏        </main>
-‏    </div>
+                        <div class="border-t pt-4 mt-4">
+                            <h4 class="font-bold mb-2">موظفو الموقع المحدد:</h4>
+                            <div class="overflow-y-auto max-h-48 border rounded bg-white">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-100 sticky top-0">
+                                        <tr>
+                                            <th class="p-2 text-right">الاسم</th>
+                                            <th class="p-2 text-right">الوظيفة</th>
+                                            <th class="p-2">توقيع</th>
+                                            <th class="p-2">حذف</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="site-employees-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <!-- مودال التوقيع -->
-‏    <div id="signature-modal" class="modal">
-‏        <div class="modal-content">
-‏            <div class="flex justify-between items-center mb-4">
-‏                <h3 class="text-lg font-bold" id="signature-modal-title">إضافة توقيع</h3>
-‏                <button onclick="closeSignatureModal()" class="text-gray-500 hover:text-gray-700">
-‏                    <i class="fas fa-times"></i>
-‏                </button>
-‏            </div>
-‏            <div class="signature-pad mb-4">
-‏                <canvas id="modal-signature-canvas" class="signature-canvas"></canvas>
-‏                <button type="button" id="clear-modal-signature" class="signature-clear">مسح التوقيع</button>
-‏            </div>
-‏            <div class="flex justify-between">
-‏                <button onclick="saveSignature()" class="bg-green-600 text-white px-4 py-2 rounded">حفظ التوقيع</button>
-‏                <button onclick="closeSignatureModal()" class="bg-gray-500 text-white px-4 py-2 rounded">إلغاء</button>
-‏            </div>
-‏        </div>
-‏    </div>
+    <div id="signature-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold" id="signature-modal-title">إضافة توقيع</h3>
+                <button onclick="closeSignatureModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="signature-pad mb-4">
+                <canvas id="modal-signature-canvas" class="signature-canvas"></canvas>
+                <button type="button" id="clear-modal-signature" class="signature-clear">مسح التوقيع</button>
+            </div>
+            <div class="flex justify-between">
+                <button onclick="saveSignature()" class="bg-green-600 text-white px-4 py-2 rounded">حفظ التوقيع</button>
+                <button onclick="closeSignatureModal()" class="bg-gray-500 text-white px-4 py-2 rounded">إلغاء</button>
+            </div>
+        </div>
+    </div>
 
     <!-- قالب PDF -->
-‏    <div id="pdf-template" style="display: none;"></div>
+    <div id="pdf-template" style="display: none;"></div>
 
-‏    <script>
+    <script>
         // تعريف المتغيرات العامة
-‏        let currentUser = null;
-‏        let currentMonth = new Date().toISOString().slice(0, 7);
-‏        let userSignatureCanvas, employeeSignatureCanvas, modalSignatureCanvas;
-‏        let userSignatureCtx, employeeSignatureCtx, modalSignatureCtx;
-‏        let currentSignatureType = null, currentSignatureId = null, currentEmpIndex = null;
+        let currentUser = null;
+        let currentMonth = new Date().toISOString().slice(0, 7);
+        let userSignatureCanvas, employeeSignatureCanvas, modalSignatureCanvas;
+        let userSignatureCtx, employeeSignatureCtx, modalSignatureCtx;
+        let currentSignatureType = null, currentSignatureId = null, currentEmpIndex = null;
 
-‏        const DB_KEYS = {
-‏            USERS: 'grisland_users',
-‏            SITES: 'grisland_sites',
-‏            ATTENDANCE: 'grisland_attendance',
-‏            SETTINGS: 'grisland_settings',
-‏            APPROVALS: 'grisland_approvals'
+        const DB_KEYS = {
+            USERS: 'grisland_users',
+            SITES: 'grisland_sites',
+            ATTENDANCE: 'grisland_attendance',
+            SETTINGS: 'grisland_settings',
+            APPROVALS: 'grisland_approvals'
         };
 
         // === الدوال الأساسية ===
-‏        function initDB() {
-‏            if (!localStorage.getItem(DB_KEYS.USERS)) {
-‏                const defaultUsers = [
-‏                    { id: '600', name: 'مدير النظام', role: 'admin', signature: '' },
-‏                    { id: '500', name: 'معتمد التقارير', role: 'approver', signature: '' },
-‏                    { id: '400', name: 'مشرف الموقع', role: 'supervisor', signature: '' },
-‏                    { id: '100', name: 'مدير العقد', role: 'contract_manager', signature: '' }
+        function initDB() {
+            if (!localStorage.getItem(DB_KEYS.USERS)) {
+                const defaultUsers = [
+                    { id: '600', name: 'مدير النظام', role: 'admin', signature: '' },
+                    { id: '500', name: 'معتمد التقارير', role: 'approver', signature: '' },
+                    { id: '400', name: 'مشرف الموقع', role: 'supervisor', signature: '' },
+                    { id: '100', name: 'مدير العقد', role: 'contract_manager', signature: '' }
                 ];
-‏                localStorage.setItem(DB_KEYS.USERS, JSON.stringify(defaultUsers));
+                localStorage.setItem(DB_KEYS.USERS, JSON.stringify(defaultUsers));
             }
-‏            if (!localStorage.getItem(DB_KEYS.SITES)) {
-‏                localStorage.setItem(DB_KEYS.SITES, JSON.stringify([]));
+            if (!localStorage.getItem(DB_KEYS.SITES)) {
+                localStorage.setItem(DB_KEYS.SITES, JSON.stringify([]));
             }
-‏            if (!localStorage.getItem(DB_KEYS.SETTINGS)) {
-‏                localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify({ logo: '' }));
+            if (!localStorage.getItem(DB_KEYS.SETTINGS)) {
+                localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify({ logo: '' }));
             }
-‏            if(!localStorage.getItem(DB_KEYS.ATTENDANCE)) {
-‏                localStorage.setItem(DB_KEYS.ATTENDANCE, JSON.stringify({}));
+            if(!localStorage.getItem(DB_KEYS.ATTENDANCE)) {
+                localStorage.setItem(DB_KEYS.ATTENDANCE, JSON.stringify({}));
             }
-‏            if(!localStorage.getItem(DB_KEYS.APPROVALS)) {
-‏                localStorage.setItem(DB_KEYS.APPROVALS, JSON.stringify({}));
+            if(!localStorage.getItem(DB_KEYS.APPROVALS)) {
+                localStorage.setItem(DB_KEYS.APPROVALS, JSON.stringify({}));
             }
         }
 
-‏        function showToast(message, type = 'success') {
-‏            const toastContainer = document.getElementById('toast-container');
-‏            const toastMessage = document.getElementById('toast-message');
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            const toastMessage = document.getElementById('toast-message');
             
-‏            const bgColor = type === 'error' ? 'bg-red-600' : 
-‏                           type === 'info' ? 'bg-blue-600' : 'bg-green-600';
+            const bgColor = type === 'error' ? 'bg-red-600' : 
+                           type === 'info' ? 'bg-blue-600' : 'bg-green-600';
 
-‏            toastMessage.className = `rounded-lg shadow-xl p-4 text-white font-semibold ${bgColor}`;
-‏            toastMessage.innerText = message;
+            toastMessage.className = `rounded-lg shadow-xl p-4 text-white font-semibold ${bgColor}`;
+            toastMessage.innerText = message;
             
-‏            toastContainer.classList.remove('opacity-0', 'pointer-events-none');
-‏            toastContainer.classList.add('opacity-100');
+            toastContainer.classList.remove('opacity-0', 'pointer-events-none');
+            toastContainer.classList.add('opacity-100');
 
-‏            setTimeout(() => {
-‏                toastContainer.classList.remove('opacity-100');
-‏                toastContainer.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toastContainer.classList.remove('opacity-100');
+                toastContainer.classList.add('opacity-0', 'pointer-events-none');
             }, 3000);
         }
 
-‏        function login() {
-‏            const id = document.getElementById('login-id').value;
-‏            if (!id) {
-‏                showToast('يرجى إدخال الرقم الوظيفي', 'error');
-‏                return;
+        function login() {
+            const id = document.getElementById('login-id').value;
+            if (!id) {
+                showToast('يرجى إدخال الرقم الوظيفي', 'error');
+                return;
             }
 
-‏            const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
-‏            const user = users.find(u => u.id === id);
+            const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
+            const user = users.find(u => u.id === id);
 
-‏            if (user) {
-‏                currentUser = user;
-‏                localStorage.setItem('currentUser', JSON.stringify(user));
-‏                document.getElementById('login-overlay').style.display = 'none';
-‏                document.getElementById('user-display').innerText = `${user.name} (${getRoleName(user.role)})`;
-‏                document.getElementById('logout-btn').classList.remove('hidden');
-‏                loadSidebarData();
-‏                setupUIForRole();
-‏                showScreen('attendance');
-‏                showToast(`مرحباً ${user.name}`, 'success');
-‏            } else {
-‏                showToast('رقم وظيفي غير صحيح', 'error');
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('user-display').innerText = `${user.name} (${getRoleName(user.role)})`;
+                document.getElementById('logout-btn').classList.remove('hidden');
+                loadSidebarData();
+                setupUIForRole();
+                showScreen('attendance');
+                showToast(`مرحباً ${user.name}`, 'success');
+            } else {
+                showToast('رقم وظيفي غير صحيح', 'error');
             }
         }
 
-‏        function logout() {
-‏            currentUser = null;
-‏            localStorage.removeItem('currentUser');
-‏            document.getElementById('login-id').value = '';
-‏            document.getElementById('login-overlay').style.display = 'flex';
-‏            document.getElementById('logout-btn').classList.add('hidden');
-‏            showToast('تم تسجيل الخروج', 'info');
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('login-id').value = '';
+            document.getElementById('login-overlay').style.display = 'flex';
+            document.getElementById('logout-btn').classList.add('hidden');
+            showToast('تم تسجيل الخروج', 'info');
         }
 
-‏        function setupUIForRole() {
-‏            const role = currentUser.role;
-‏            const navSettings = document.getElementById('nav-settings');
+        function setupUIForRole() {
+            const role = currentUser.role;
+            const navSettings = document.getElementById('nav-settings');
             
-‏            if (role === 'admin') {
-‏                navSettings.classList.remove('hidden');
-‏                loadSettingsView();
-‏                initSignaturePads();
-‏            } else {
-‏                navSettings.classList.add('hidden');
+            if (role === 'admin') {
+                navSettings.classList.remove('hidden');
+                loadSettingsView();
+                initSignaturePads();
+            } else {
+                navSettings.classList.add('hidden');
             }
 
-‏            loadSitesDropdown();
-‏            document.getElementById('month-picker').value = currentMonth;
+            loadSitesDropdown();
+            loadReportsDropdown();
+            document.getElementById('month-picker').value = currentMonth;
+            document.getElementById('report-month').value = currentMonth;
         }
 
-‏        function showScreen(screenId) {
-‏            document.getElementById('screen-attendance').classList.add('hidden');
-‏            document.getElementById('screen-settings').classList.add('hidden');
-‏            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+        function showScreen(screenId) {
+            // إخفاء جميع الشاشات
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
             
-‏            if(window.innerWidth < 768) {
-‏                document.getElementById('sidebar').classList.remove('open');
+            // إظهار الشاشة المطلوبة
+            document.getElementById(`screen-${screenId}`).classList.add('active');
+            
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.remove('open');
             }
         }
 
         // === إدارة المواقع ===
-‏        function loadSitesDropdown() {
-‏            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
-‏            const select = document.getElementById('site-select');
-‏            const settingsSelect = document.getElementById('settings-site-select');
+        function loadSitesDropdown() {
+            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+            const select = document.getElementById('site-select');
+            const settingsSelect = document.getElementById('settings-site-select');
+            const reportSelect = document.getElementById('report-site-select');
             
-‏            select.innerHTML = '<option value="">-- اختر المسلخ --</option>';
-‏            settingsSelect.innerHTML = '<option value="">اختر الموقع أولاً</option>';
+            select.innerHTML = '<option value="">-- اختر المسلخ --</option>';
+            settingsSelect.innerHTML = '<option value="">اختر الموقع أولاً</option>';
+            reportSelect.innerHTML = '<option value="">جميع المواقع</option>';
             
-‏            sites.forEach(site => {
-‏                const opt = document.createElement('option');
-‏                opt.value = site.id;
-‏                opt.innerText = site.name;
-‏                select.appendChild(opt.cloneNode(true));
-‏                settingsSelect.appendChild(opt);
+            sites.forEach(site => {
+                const opt = document.createElement('option');
+                opt.value = site.id;
+                opt.innerText = site.name;
+                select.appendChild(opt.cloneNode(true));
+                settingsSelect.appendChild(opt.cloneNode(true));
+                
+                const reportOpt = document.createElement('option');
+                reportOpt.value = site.id;
+                reportOpt.innerText = site.name;
+                reportSelect.appendChild(reportOpt);
             });
         }
 
-‏        function addSite() {
-‏            const name = document.getElementById('new-site-name').value.trim();
-‏            if (!name) {
-‏                showToast('يرجى إدخال اسم المسلخ', 'error');
-‏                return;
-            }
+        function loadReportsDropdown() {
+            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+            const reportSelect = document.getElementById('report-site-select');
+            reportSelect.innerHTML = '<option value="">جميع المواقع</option>';
             
-‏            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
-‏            const newId = Date.now().toString();
-‏            sites.push({ id: newId, name: name, employees: [] });
-‏            localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
-‏            document.getElementById('new-site-name').value = '';
-‏            showToast('تم إضافة الموقع بنجاح', 'success');
-‏            loadSitesDropdown();
+            sites.forEach(site => {
+                const opt = document.createElement('option');
+                opt.value = site.id;
+                opt.innerText = site.name;
+                reportSelect.appendChild(opt);
+            });
         }
 
-‏        function loadSiteEmployees() {
-‏            const siteId = document.getElementById('settings-site-select').value;
-‏            const tbody = document.getElementById('site-employees-body');
-‏            tbody.innerHTML = '';
-
-‏            if (!siteId) return;
-
-‏            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
-‏            const site = sites.find(s => s.id === siteId);
+        function addSite() {
+            const name = document.getElementById('new-site-name').value.trim();
+            if (!name) {
+                showToast('يرجى إدخال اسم المسلخ', 'error');
+                return;
+            }
             
-‏            if (site && site.employees) {
-‏                site.employees.forEach((emp, index) => {
-‏                    const tr = document.createElement('tr');
-‏                    const signatureCell = emp.signature ? 
-‏                        `<td><img src="${emp.signature}" class="signature-image mx-auto" style="height: 30px;"></td>` :
-‏                        `<td><span class="text-gray-400 text-sm">لا يوجد</span></td>`;
+            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+            const newId = Date.now().toString();
+            sites.push({ id: newId, name: name, employees: [] });
+            localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
+            document.getElementById('new-site-name').value = '';
+            showToast('تم إضافة الموقع بنجاح', 'success');
+            loadSitesDropdown();
+            loadReportsDropdown();
+        }
+
+        function loadSiteEmployees() {
+            const siteId = document.getElementById('settings-site-select').value;
+            const tbody = document.getElementById('site-employees-body');
+            tbody.innerHTML = '';
+
+            if (!siteId) return;
+
+            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+            const site = sites.find(s => s.id === siteId);
+            
+            if (site && site.employees) {
+                site.employees.forEach((emp, index) => {
+                    const tr = document.createElement('tr');
+                    const signatureCell = emp.signature ? 
+                        `<td><img src="${emp.signature}" class="signature-image mx-auto" style="height: 30px;"></td>` :
+                        `<td><span class="text-gray-400 text-sm">لا يوجد</span></td>`;
                     
-‏                    tr.innerHTML = `
-‏                        <td class="p-2 text-right">${emp.name}</td>
-‏                        <td class="p-2 text-right">${emp.role}</td>
-‏                        ${signatureCell}
-‏                        <td class="p-2">
-‏                            <button onclick="deleteEmployee('${siteId}', ${index})" class="text-red-500 hover:text-red-700">
-‏                                <i class="fas fa-trash"></i>
-‏                            </button>
-‏                        </td>
+                    tr.innerHTML = `
+                        <td class="p-2 text-right">${emp.name}</td>
+                        <td class="p-2 text-right">${emp.role}</td>
+                        ${signatureCell}
+                        <td class="p-2">
+                            <button onclick="deleteEmployee('${siteId}', ${index})" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
                     `;
-‏                    tbody.appendChild(tr);
+                    tbody.appendChild(tr);
                 });
             }
         }
 
-‏        function deleteEmployee(siteId, empIndex) {
-‏            if (confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
-‏                const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
-‏                const siteIndex = sites.findIndex(s => s.id === siteId);
-‏                if (siteIndex !== -1) {
-‏                    sites[siteIndex].employees.splice(empIndex, 1);
-‏                    localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
-‏                    loadSiteEmployees();
-‏                    showToast('تم حذف الموظف بنجاح', 'info');
+        function deleteEmployee(siteId, empIndex) {
+            if (confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
+                const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+                const siteIndex = sites.findIndex(s => s.id === siteId);
+                if (siteIndex !== -1) {
+                    sites[siteIndex].employees.splice(empIndex, 1);
+                    localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
+                    loadSiteEmployees();
+                    showToast('تم حذف الموظف بنجاح', 'info');
                 }
             }
         }
 
         // === إدارة الموظفين ===
-‏        function addEmployee() {
-‏            const siteId = document.getElementById('settings-site-select').value;
-‏            const name = document.getElementById('emp-name').value.trim();
-‏            const role = document.getElementById('emp-role').value;
+        function addEmployee() {
+            const siteId = document.getElementById('settings-site-select').value;
+            const name = document.getElementById('emp-name').value.trim();
+            const role = document.getElementById('emp-role').value;
             
-‏            if (!siteId || !name) {
-‏                showToast('يرجى تعبئة جميع الحقول واختيار الموقع', 'error');
-‏                return;
+            if (!siteId || !name) {
+                showToast('يرجى تعبئة جميع الحقول واختيار الموقع', 'error');
+                return;
             }
 
-‏            const signatureData = getSignatureData('employee');
+            const signatureData = getSignatureData('employee');
             
-‏            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
-‏            const siteIndex = sites.findIndex(s => s.id == siteId);
-‏            if (siteIndex !== -1) {
-‏                sites[siteIndex].employees.push({
-‏                    name: name,
-‏                    role: role,
-‏                    signature: signatureData
+            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+            const siteIndex = sites.findIndex(s => s.id == siteId);
+            if (siteIndex !== -1) {
+                sites[siteIndex].employees.push({
+                    name: name,
+                    role: role,
+                    signature: signatureData
                 });
-‏                localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
-‏                showToast('تم إضافة الموظف بنجاح', 'success');
-‏                document.getElementById('emp-name').value = '';
-‏                clearSignature('employee');
-‏                loadSiteEmployees();
+                localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
+                showToast('تم إضافة الموظف بنجاح', 'success');
+                document.getElementById('emp-name').value = '';
+                clearSignature('employee');
+                loadSiteEmployees();
             }
         }
 
         // === إدارة المستخدمين ===
-‏        function addUser() {
-‏            const name = document.getElementById('new-user-name').value.trim();
-‏            const id = document.getElementById('new-user-id').value;
-‏            const role = document.getElementById('new-user-role').value;
+        function addUser() {
+            const name = document.getElementById('new-user-name').value.trim();
+            const id = document.getElementById('new-user-id').value;
+            const role = document.getElementById('new-user-role').value;
 
-‏            if(!name || !id) {
-‏                showToast('يرجى إدخال الاسم والرقم الوظيفي', 'error');
-‏                return;
+            if(!name || !id) {
+                showToast('يرجى إدخال الاسم والرقم الوظيفي', 'error');
+                return;
             }
 
-‏            const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
-‏            if(users.find(u => u.id === id)) {
-‏                showToast('الرقم الوظيفي موجود مسبقاً', 'error');
-‏                return;
+            const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
+            if(users.find(u => u.id === id)) {
+                showToast('الرقم الوظيفي موجود مسبقاً', 'error');
+                return;
             }
 
-‏            const signatureData = getSignatureData('user');
+            const signatureData = getSignatureData('user');
             
-‏            users.push({
-‏                name: name,
-‏                id: id,
-‏                role: role,
-‏                signature: signatureData
+            users.push({
+                name: name,
+                id: id,
+                role: role,
+                signature: signatureData
             });
-‏            localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
-‏            loadSettingsView();
-‏            document.getElementById('new-user-name').value = '';
-‏            document.getElementById('new-user-id').value = '';
-‏            clearSignature('user');
-‏            showToast('تم إضافة المستخدم بنجاح', 'success');
+            localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+            loadSettingsView();
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-id').value = '';
+            clearSignature('user');
+            showToast('تم إضافة المستخدم بنجاح', 'success');
         }
 
-‏        function deleteUser(id) {
-‏            if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-‏                let users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
-‏                users = users.filter(u => u.id !== id);
-‏                localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
-‏                loadSettingsView();
-‏                showToast('تم حذف المستخدم بنجاح', 'info');
+        function deleteUser(id) {
+            if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                let users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
+                users = users.filter(u => u.id !== id);
+                localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+                loadSettingsView();
+                showToast('تم حذف المستخدم بنجاح', 'info');
             }
         }
 
-‏        function loadSettingsView() {
-‏            const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
-‏            const tbody = document.getElementById('users-table-body');
-‏            tbody.innerHTML = '';
+        function loadSettingsView() {
+            const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
             
-‏            users.forEach((u) => {
-‏                if(u.id === '600') return;
+            users.forEach((u) => {
+                if(u.id === '600') return;
                 
-‏                const hasSig = u.signature ? 
-‏                    `<img src="${u.signature}" class="h-6 w-auto mx-auto cursor-pointer signature-image" onclick="openSignatureModal('user', '${u.id}')">` : 
-‏                    `<span class="text-gray-400 cursor-pointer text-sm" onclick="openSignatureModal('user', '${u.id}')">إضافة توقيع</span>`;
+                const hasSig = u.signature ? 
+                    `<img src="${u.signature}" class="h-6 w-auto mx-auto cursor-pointer signature-image" onclick="openSignatureModal('user', '${u.id}')">` : 
+                    `<span class="text-gray-400 cursor-pointer text-sm" onclick="openSignatureModal('user', '${u.id}')">إضافة توقيع</span>`;
                 
-‏                const tr = document.createElement('tr');
-‏                tr.innerHTML = `
-‏                    <td class="p-2 text-right">${u.name}</td>
-‏                    <td class="p-2 text-right">${getRoleName(u.role)}</td>
-‏                    <td class="p-2 text-right">${u.id}</td>
-‏                    <td class="p-2 text-center">${hasSig}</td>
-‏                    <td class="p-2">
-‏                        <button onclick="deleteUser('${u.id}')" class="text-red-500 hover:text-red-700">
-‏                            <i class="fas fa-trash"></i>
-‏                        </button>
-‏                    </td>
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 text-right">${u.name}</td>
+                    <td class="p-2 text-right">${getRoleName(u.role)}</td>
+                    <td class="p-2 text-right">${u.id}</td>
+                    <td class="p-2 text-center">${hasSig}</td>
+                    <td class="p-2">
+                        <button onclick="deleteUser('${u.id}')" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
-‏                tbody.appendChild(tr);
+                tbody.appendChild(tr);
             });
         }
 
         // === نظام الحضور ===
-‏        function loadAttendanceTable() {
-‏            const siteId = document.getElementById('site-select').value;
-‏            const monthVal = document.getElementById('month-picker').value;
+        function loadAttendanceTable() {
+            const siteId = document.getElementById('site-select').value;
+            const monthVal = document.getElementById('month-picker').value;
             
-‏            if (!siteId || !monthVal) {
-‏                document.getElementById('current-site-name').innerText = "-- اختر الموقع --";
-‏                document.getElementById('table-body').innerHTML = '<tr><td colspan="100" class="p-4 text-center text-gray-500">الرجاء اختيار الموقع والشهر</td></tr>';
-‏                document.getElementById('attendance-status-bar').classList.add('hidden');
-‏                hideAllButtons();
-‏                return;
+            if (!siteId || !monthVal) {
+                document.getElementById('current-site-name').innerText = "-- اختر الموقع --";
+                document.getElementById('table-body').innerHTML = '<tr><td colspan="100" class="p-4 text-center text-gray-500">الرجاء اختيار الموقع والشهر</td></tr>';
+                document.getElementById('attendance-status-bar').classList.add('hidden');
+                hideAllButtons();
+                return;
             }
 
-‏            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
-‏            const site = sites.find(s => s.id == siteId);
-‏            if (!site) {
-‏                showToast('الموقع غير موجود', 'error');
-‏                return;
+            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+            const site = sites.find(s => s.id == siteId);
+            if (!site) {
+                showToast('الموقع غير موجود', 'error');
+                return;
             }
 
-‏            document.getElementById('current-site-name').innerText = site.name;
+            document.getElementById('current-site-name').innerText = site.name;
 
-‏            const [year, month] = monthVal.split('-');
-‏            const daysInMonth = new Date(year, month, 0).getDate();
+            const [year, month] = monthVal.split('-');
+            const daysInMonth = new Date(year, month, 0).getDate();
 
             // بناء رأس الجدول
-‏            let headerHTML = `<th class="w-32 sticky right-0 bg-gray-100 z-10">الموظف</th><th class="w-24">الوظيفة</th>`;
-‏            for (let i = 1; i <= daysInMonth; i++) {
-‏                headerHTML += `<th class="w-8">${i}</th>`;
+            let headerHTML = `<th class="w-32 sticky right-0 bg-gray-100 z-10">الموظف</th><th class="w-24">الوظيفة</th>`;
+            for (let i = 1; i <= daysInMonth; i++) {
+                headerHTML += `<th class="w-8">${i}</th>`;
             }
-‏            headerHTML += `<th class="w-24">أيام الحضور</th><th class="w-24">التوقيع</th>`;
-‏            document.getElementById('table-header-row').innerHTML = headerHTML;
+            headerHTML += `<th class="w-24">أيام الحضور</th><th class="w-24">التوقيع</th>`;
+            document.getElementById('table-header-row').innerHTML = headerHTML;
 
             // بناء جسم الجدول
-‏            const tableBody = document.getElementById('table-body');
-‏            tableBody.innerHTML = '';
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
 
-‏            if (!site.employees || site.employees.length === 0) {
-‏                tableBody.innerHTML = `<tr><td colspan="${daysInMonth + 4}" class="p-4 text-center">لا يوجد موظفين مسجلين لهذا الموقع</td></tr>`;
-‏                hideAllButtons();
-‏                return;
+            if (!site.employees || site.employees.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="${daysInMonth + 4}" class="p-4 text-center">لا يوجد موظفين مسجلين لهذا الموقع</td></tr>`;
+                hideAllButtons();
+                return;
             }
 
-‏            const attendanceKey = `${siteId}_${monthVal}`;
-‏            const allAttendance = JSON.parse(localStorage.getItem(DB_KEYS.ATTENDANCE));
-‏            const siteAttendance = allAttendance[attendanceKey] || {};
+            const attendanceKey = `${siteId}_${monthVal}`;
+            const allAttendance = JSON.parse(localStorage.getItem(DB_KEYS.ATTENDANCE));
+            const siteAttendance = allAttendance[attendanceKey] || {};
 
-‏            site.employees.forEach((emp, index) => {
-‏                const tr = document.createElement('tr');
-‏                let rowHTML = `<td class="sticky right-0 bg-white font-bold z-10">${emp.name}</td><td>${emp.role}</td>`;
+            site.employees.forEach((emp, index) => {
+                const tr = document.createElement('tr');
+                let rowHTML = `<td class="sticky right-0 bg-white font-bold z-10">${emp.name}</td><td>${emp.role}</td>`;
                 
-‏                let attendanceDays = 0;
+                let attendanceDays = 0;
                 
-‏                for (let i = 1; i <= daysInMonth; i++) {
-‏                    const status = siteAttendance[index] && siteAttendance[index][i] ? siteAttendance[index][i] : 'P';
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const status = siteAttendance[index] && siteAttendance[index][i] ? siteAttendance[index][i] : 'P';
                     
-‏                    rowHTML += `<td>
-‏                        <select data-emp="${index}" data-day="${i}" class="attendance-select" onchange="updateAttendanceDays(${index}, ${daysInMonth})">
-‏                            <option value="P" ${status==='P'?'selected':''}>P</option>
-‏                            <option value="A" ${status==='A'?'selected':''}>A</option>
-‏                            <option value="V" ${status==='V'?'selected':''}>V</option>
-‏                        </select>
-‏                    </td>`;
+                    rowHTML += `<td>
+                        <select data-emp="${index}" data-day="${i}" class="attendance-select" onchange="updateAttendanceDays(${index}, ${daysInMonth})">
+                            <option value="P" ${status==='P'?'selected':''}>P</option>
+                            <option value="A" ${status==='A'?'selected':''}>A</option>
+                            <option value="V" ${status==='V'?'selected':''}>V</option>
+                        </select>
+                    </td>`;
                     
-‏                    if (status === 'P' || status === 'V') {
-‏                        attendanceDays++;
+                    if (status === 'P' || status === 'V') {
+                        attendanceDays++;
                     }
                 }
                 
-‏                rowHTML += `<td class="attendance-days" id="attendance-days-${index}">${attendanceDays}</td>`;
+                rowHTML += `<td class="attendance-days" id="attendance-days-${index}">${attendanceDays}</td>`;
                 
                 // إضافة التوقيع
-‏                const sigSrc = emp.signature || '';
-‏                const signatureCell = sigSrc ? 
-‏                    `<td><img src="${sigSrc}" class="signature-image mx-auto cursor-pointer" onclick="openSignatureModal('employee', '${siteId}', ${index})"></td>` :
-‏                    `<td><span class="text-gray-400 cursor-pointer text-sm" onclick="openSignatureModal('employee', '${siteId}', ${index})">إضافة توقيع</span></td>`;
+                const sigSrc = emp.signature || '';
+                const signatureCell = sigSrc ? 
+                    `<td><img src="${sigSrc}" class="signature-image mx-auto cursor-pointer" onclick="openSignatureModal('employee', '${siteId}', ${index})"></td>` :
+                    `<td><span class="text-gray-400 cursor-pointer text-sm" onclick="openSignatureModal('employee', '${siteId}', ${index})">إضافة توقيع</span></td>`;
                 
-‏                rowHTML += signatureCell;
-‏                tr.innerHTML = rowHTML;
-‏                tableBody.appendChild(tr);
+                rowHTML += signatureCell;
+                tr.innerHTML = rowHTML;
+                tableBody.appendChild(tr);
             });
 
             // إظهار أزرار الحفظ والاعتماد
-‏            setupActionButtons(siteId, monthVal);
+            setupActionButtons(siteId, monthVal);
         }
 
-‏        function hideAllButtons() {
-‏            document.getElementById('btn-save').classList.add('hidden');
-‏            document.getElementById('btn-approve-sup').classList.add('hidden');
-‏            document.getElementById('btn-approve-app').classList.add('hidden');
+        function hideAllButtons() {
+            document.getElementById('btn-save').classList.add('hidden');
+            document.getElementById('btn-approve-sup').classList.add('hidden');
+            document.getElementById('btn-approve-app').classList.add('hidden');
         }
 
-‏        function updateAttendanceDays(empIndex, daysInMonth) {
-‏            const row = document.querySelector(`tr:nth-child(${empIndex + 1})`);
-‏            if (!row) return;
+        function updateAttendanceDays(empIndex, daysInMonth) {
+            const row = document.querySelector(`tr:nth-child(${empIndex + 1})`);
+            if (!row) return;
             
-‏            const daySelects = row.querySelectorAll('.attendance-select');
-‏            let attendanceDays = 0;
+            const daySelects = row.querySelectorAll('.attendance-select');
+            let attendanceDays = 0;
             
-‏            daySelects.forEach(select => {
-‏                if (select.value === 'P' || select.value === 'V') {
-‏                    attendanceDays++;
+            daySelects.forEach(select => {
+                if (select.value === 'P' || select.value === 'V') {
+                    attendanceDays++;
                 }
             });
             
-‏            const daysElement = document.getElementById(`attendance-days-${empIndex}`);
-‏            if (daysElement) {
-‏                daysElement.textContent = attendanceDays;
+            const daysElement = document.getElementById(`attendance-days-${empIndex}`);
+            if (daysElement) {
+                daysElement.textContent = attendanceDays;
             }
         }
 
-‏        function saveAttendance() {
-‏            const siteId = document.getElementById('site-select').value;
-‏            const monthVal = document.getElementById('month-picker').value;
+        function saveAttendance() {
+            const siteId = document.getElementById('site-select').value;
+            const monthVal = document.getElementById('month-picker').value;
             
-‏            if (!siteId || !monthVal) {
-‏                showToast('الرجاء اختيار الموقع والشهر أولاً', 'error');
-‏                return;
+            if (!siteId || !monthVal) {
+                showToast('الرجاء اختيار الموقع والشهر أولاً', 'error');
+                return;
             }
 
-‏            const inputs = document.querySelectorAll('#main-table select.attendance-select');
-‏            const data = {};
+            const inputs = document.querySelectorAll('#main-table select.attendance-select');
+            const data = {};
 
-‏            inputs.forEach(input => {
-‏                const empIdx = input.getAttribute('data-emp');
-‏                const day = input.getAttribute('data-day');
-‏                const val = input.value;
-‏                if (!data[empIdx]) data[empIdx] = {};
-‏                data[empIdx][day] = val;
+            inputs.forEach(input => {
+                const empIdx = input.getAttribute('data-emp');
+                const day = input.getAttribute('data-day');
+                const val = input.value;
+                if (!data[empIdx]) data[empIdx] = {};
+                data[empIdx][day] = val;
             });
 
-‏            const allAttendance = JSON.parse(localStorage.getItem(DB_KEYS.ATTENDANCE));
-‏            const key = `${siteId}_${monthVal}`;
-‏            allAttendance[key] = data;
-‏            localStorage.setItem(DB_KEYS.ATTENDANCE, JSON.stringify(allAttendance));
+            const allAttendance = JSON.parse(localStorage.getItem(DB_KEYS.ATTENDANCE));
+            const key = `${siteId}_${monthVal}`;
+            allAttendance[key] = data;
+            localStorage.setItem(DB_KEYS.ATTENDANCE, JSON.stringify(allAttendance));
             
-‏            showToast('تم حفظ البيانات بنجاح', 'success');
+            showToast('تم حفظ البيانات بنجاح', 'success');
         }
 
-‏        function approveReport(type) {
-‏            const siteId = document.getElementById('site-select').value;
-‏            const monthVal = document.getElementById('month-picker').value;
+        function approveReport(type) {
+            const siteId = document.getElementById('site-select').value;
+            const monthVal = document.getElementById('month-picker').value;
             
-‏            if (!siteId || !monthVal) {
-‏                showToast('الرجاء اختيار التقرير أولاً', 'error');
-‏                return;
+            if (!siteId || !monthVal) {
+                showToast('الرجاء اختيار التقرير أولاً', 'error');
+                return;
             }
             
-‏            const key = `${siteId}_${monthVal}`;
-‏            const allApprovals = JSON.parse(localStorage.getItem(DB_KEYS.APPROVALS));
-‏            const current = allApprovals[key] || { supervisor: false, approver: false };
+            const key = `${siteId}_${monthVal}`;
+            const allApprovals = JSON.parse(localStorage.getItem(DB_KEYS.APPROVALS));
+            const current = allApprovals[key] || { supervisor: false, approver: false };
 
-‏            if (type === 'supervisor') {
-‏                current.supervisor = true;
-‏                showToast('تم اعتماد مشرف الموقع', 'success');
-‏            } else if (type === 'approver') {
-‏                if (!current.supervisor) {
-‏                    showToast('لا يمكن الاعتماد قبل اعتماد مشرف الموقع', 'error');
-‏                    return;
+            if (type === 'supervisor') {
+                current.supervisor = true;
+                showToast('تم اعتماد مشرف الموقع', 'success');
+            } else if (type === 'approver') {
+                if (!current.supervisor) {
+                    showToast('لا يمكن الاعتماد قبل اعتماد مشرف الموقع', 'error');
+                    return;
                 }
-‏                current.approver = true;
-‏                showToast('تم اعتماد التقرير نهائياً', 'success');
+                current.approver = true;
+                showToast('تم اعتماد التقرير نهائياً', 'success');
             }
 
-‏            allApprovals[key] = current;
-‏            localStorage.setItem(DB_KEYS.APPROVALS, JSON.stringify(allApprovals));
-‏            loadAttendanceTable();
+            allApprovals[key] = current;
+            localStorage.setItem(DB_KEYS.APPROVALS, JSON.stringify(allApprovals));
+            loadAttendanceTable();
         }
 
-‏        function setupActionButtons(siteId, monthVal) {
-‏            const key = `${siteId}_${monthVal}`;
-‏            const allApprovals = JSON.parse(localStorage.getItem(DB_KEYS.APPROVALS));
-‏            const approvals = allApprovals[key] || { supervisor: false, approver: false };
+        function setupActionButtons(siteId, monthVal) {
+            const key = `${siteId}_${monthVal}`;
+            const allApprovals = JSON.parse(localStorage.getItem(DB_KEYS.APPROVALS));
+            const approvals = allApprovals[key] || { supervisor: false, approver: false };
 
-‏            const btnSave = document.getElementById('btn-save');
-‏            const btnApproveSup = document.getElementById('btn-approve-sup');
-‏            const btnApproveApp = document.getElementById('btn-approve-app');
+            const btnSave = document.getElementById('btn-save');
+            const btnApproveSup = document.getElementById('btn-approve-sup');
+            const btnApproveApp = document.getElementById('btn-approve-app');
 
             // إظهار زر الحفظ دائماً للمستخدمين المسموح لهم
-‏            if (currentUser.role === 'admin' || currentUser.role === 'supervisor') {
-‏                btnSave.classList.remove('hidden');
-‏            } else {
-‏                btnSave.classList.add('hidden');
+            if (currentUser.role === 'admin' || currentUser.role === 'supervisor') {
+                btnSave.classList.remove('hidden');
+            } else {
+                btnSave.classList.add('hidden');
             }
 
             // إظهار أزرار الاعتماد حسب الصلاحيات
-‏            btnApproveSup.classList.add('hidden');
-‏            btnApproveApp.classList.add('hidden');
+            btnApproveSup.classList.add('hidden');
+            btnApproveApp.classList.add('hidden');
 
-‏            if (currentUser.role === 'supervisor' && !approvals.supervisor) {
-‏                btnApproveSup.classList.remove('hidden');
+            if (currentUser.role === 'supervisor' && !approvals.supervisor) {
+                btnApproveSup.classList.remove('hidden');
             }
-‏            if (currentUser.role === 'approver' && approvals.supervisor && !approvals.approver) {
-‏                btnApproveApp.classList.remove('hidden');
+            if (currentUser.role === 'approver' && approvals.supervisor && !approvals.approver) {
+                btnApproveApp.classList.remove('hidden');
             }
+        }
+
+        // === نظام التقارير ===
+        function generateReport() {
+            const siteId = document.getElementById('report-site-select').value;
+            const monthVal = document.getElementById('report-month').value;
+            
+            if (!monthVal) {
+                showToast('يرجى اختيار الفترة', 'error');
+                return;
+            }
+
+            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+            const filteredSites = siteId ? sites.filter(s => s.id === siteId) : sites;
+            
+            let totalEmployees = 0;
+            let totalAttendanceDays = 0;
+            let totalPossibleDays = 0;
+            const reportData = [];
+
+            filteredSites.forEach(site => {
+                if (site.employees) {
+                    totalEmployees += site.employees.length;
+                    
+                    site.employees.forEach(emp => {
+                        const [year, month] = monthVal.split('-');
+                        const daysInMonth = new Date(year, month, 0).getDate();
+                        totalPossibleDays += daysInMonth;
+                        
+                        const attendanceKey = `${site.id}_${monthVal}`;
+                        const allAttendance = JSON.parse(localStorage.getItem(DB_KEYS.ATTENDANCE));
+                        const siteAttendance = allAttendance[attendanceKey] || {};
+                        const empIndex = site.employees.indexOf(emp);
+                        
+                        let empAttendanceDays = 0;
+                        let empAbsenceDays = 0;
+                        let empVacationDays = 0;
+                        
+                        for (let i = 1; i <= daysInMonth; i++) {
+                            const status = siteAttendance[empIndex] && siteAttendance[empIndex][i] ? siteAttendance[empIndex][i] : 'P';
+                            
+                            if (status === 'P') empAttendanceDays++;
+                            else if (status === 'A') empAbsenceDays++;
+                            else if (status === 'V') empVacationDays++;
+                        }
+                        
+                        totalAttendanceDays += empAttendanceDays;
+                        const attendanceRate = ((empAttendanceDays / daysInMonth) * 100).toFixed(1);
+                        
+                        reportData.push({
+                            name: emp.name,
+                            site: site.name,
+                            attendance: empAttendanceDays,
+                            absence: empAbsenceDays,
+                            vacation: empVacationDays,
+                            rate: attendanceRate
+                        });
+                    });
+                }
+            });
+
+            // تحديث الإحصائيات
+            document.getElementById('total-employees').textContent = totalEmployees;
+            const attendanceRate = totalPossibleDays > 0 ? ((totalAttendanceDays / totalPossibleDays) * 100).toFixed(1) : 0;
+            document.getElementById('attendance-rate').textContent = attendanceRate + '%';
+            document.getElementById('absence-rate').textContent = (100 - attendanceRate).toFixed(1) + '%';
+
+            // تحديث جدول التقرير
+            const reportBody = document.getElementById('report-body');
+            reportBody.innerHTML = '';
+
+            if (reportData.length === 0) {
+                reportBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">لا توجد بيانات للعرض</td></tr>';
+                return;
+            }
+
+            reportData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b';
+                tr.innerHTML = `
+                    <td class="p-3 text-right">${item.name}</td>
+                    <td class="p-3 text-right">${item.site}</td>
+                    <td class="p-3 text-center">${item.attendance}</td>
+                    <td class="p-3 text-center">${item.absence}</td>
+                    <td class="p-3 text-center">${item.vacation}</td>
+                    <td class="p-3 text-center ${parseFloat(item.rate) >= 80 ? 'text-green-600' : 'text-red-600'} font-bold">
+                        ${item.rate}%
+                    </td>
+                `;
+                reportBody.appendChild(tr);
+            });
+
+            showToast('تم إنشاء التقرير بنجاح', 'success');
         }
 
         // === نظام التوقيعات ===
-‏        function initSignaturePads() {
-‏            initializeCanvas('user-signature-canvas', 'user');
-‏            initializeCanvas('employee-signature-canvas', 'employee');
-‏            initializeCanvas('modal-signature-canvas', 'modal');
+        function initSignaturePads() {
+            initializeCanvas('user-signature-canvas', 'user');
+            initializeCanvas('employee-signature-canvas', 'employee');
+            initializeCanvas('modal-signature-canvas', 'modal');
 
             // إضافة مستمعي الأحداث لأزرار المسح
-‏            document.getElementById('clear-user-signature').addEventListener('click', () => clearSignature('user'));
-‏            document.getElementById('clear-employee-signature').addEventListener('click', () => clearSignature('employee'));
-‏            document.getElementById('clear-modal-signature').addEventListener('click', () => clearSignature('modal'));
+            document.getElementById('clear-user-signature').addEventListener('click', () => clearSignature('user'));
+            document.getElementById('clear-employee-signature').addEventListener('click', () => clearSignature('employee'));
+            document.getElementById('clear-modal-signature').addEventListener('click', () => clearSignature('modal'));
         }
 
-‏        function initializeCanvas(canvasId, type) {
-‏            const canvas = document.getElementById(canvasId);
-‏            const ctx = canvas.getContext('2d');
+        function initializeCanvas(canvasId, type) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
             
             // تعيين حجم الكانفاس
-‏            canvas.width = canvas.offsetWidth;
-‏            canvas.height = canvas.offsetHeight;
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
             
             // تهيئة الكانفاس
-‏            ctx.fillStyle = 'white';
-‏            ctx.fillRect(0, 0, canvas.width, canvas.height);
-‏            ctx.strokeStyle = '#000';
-‏            ctx.lineWidth = 2;
-‏            ctx.lineCap = 'round';
-‏            ctx.lineJoin = 'round';
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
 
             // تعيين المتغيرات المناسبة
-‏            if (type === 'user') {
-‏                userSignatureCanvas = canvas;
-‏                userSignatureCtx = ctx;
-‏            } else if (type === 'employee') {
-‏                employeeSignatureCanvas = canvas;
-‏                employeeSignatureCtx = ctx;
-‏            } else if (type === 'modal') {
-‏                modalSignatureCanvas = canvas;
-‏                modalSignatureCtx = ctx;
+            if (type === 'user') {
+                userSignatureCanvas = canvas;
+                userSignatureCtx = ctx;
+            } else if (type === 'employee') {
+                employeeSignatureCanvas = canvas;
+                employeeSignatureCtx = ctx;
+            } else if (type === 'modal') {
+                modalSignatureCanvas = canvas;
+                modalSignatureCtx = ctx;
             }
 
-‏            setupCanvasEvents(canvas, ctx, type);
+            setupCanvasEvents(canvas, ctx, type);
         }
 
-‏        function setupCanvasEvents(canvas, ctx, type) {
-‏            let isDrawing = false;
-‏            let lastX = 0;
-‏            let lastY = 0;
+        function setupCanvasEvents(canvas, ctx, type) {
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
 
-‏            function getMousePos(canvas, evt) {
-‏                const rect = canvas.getBoundingClientRect();
-‏                return {
-‏                    x: evt.clientX - rect.left,
-‏                    y: evt.clientY - rect.top
+            function getMousePos(canvas, evt) {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
                 };
             }
 
-‏            function startDrawing(e) {
-‏                isDrawing = true;
-‏                const pos = getMousePos(canvas, e);
-‏                [lastX, lastY] = [pos.x, pos.y];
+            function startDrawing(e) {
+                isDrawing = true;
+                const pos = getMousePos(canvas, e);
+                [lastX, lastY] = [pos.x, pos.y];
             }
 
-‏            function draw(e) {
-‏                if (!isDrawing) return;
-‏                const pos = getMousePos(canvas, e);
+            function draw(e) {
+                if (!isDrawing) return;
+                const pos = getMousePos(canvas, e);
                 
-‏                ctx.beginPath();
-‏                ctx.moveTo(lastX, lastY);
-‏                ctx.lineTo(pos.x, pos.y);
-‏                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
                 
-‏                [lastX, lastY] = [pos.x, pos.y];
+                [lastX, lastY] = [pos.x, pos.y];
             }
 
-‏            function stopDrawing() {
-‏                isDrawing = false;
+            function stopDrawing() {
+                isDrawing = false;
             }
 
             // أحداث الماوس
-‏            canvas.addEventListener('mousedown', startDrawing);
-‏            canvas.addEventListener('mousemove', draw);
-‏            canvas.addEventListener('mouseup', stopDrawing);
-‏            canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
 
             // أحداث اللمس
-‏            canvas.addEventListener('touchstart', (e) => {
-‏                e.preventDefault();
-‏                if (e.touches.length === 1) {
-‏                    const touch = e.touches[0];
-‏                    const mouseEvent = new MouseEvent('mousedown', {
-‏                        clientX: touch.clientX,
-‏                        clientY: touch.clientY
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    const mouseEvent = new MouseEvent('mousedown', {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
                     });
-‏                    canvas.dispatchEvent(mouseEvent);
+                    canvas.dispatchEvent(mouseEvent);
                 }
             });
             
-‏            canvas.addEventListener('touchmove', (e) => {
-‏                e.preventDefault();
-‏                if (e.touches.length === 1) {
-‏                    const touch = e.touches[0];
-‏                    const mouseEvent = new MouseEvent('mousemove', {
-‏                        clientX: touch.clientX,
-‏                        clientY: touch.clientY
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    const mouseEvent = new MouseEvent('mousemove', {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
                     });
-‏                    canvas.dispatchEvent(mouseEvent);
+                    canvas.dispatchEvent(mouseEvent);
                 }
             });
             
-‏            canvas.addEventListener('touchend', () => {
-‏                const mouseEvent = new MouseEvent('mouseup', {});
-‏                canvas.dispatchEvent(mouseEvent);
+            canvas.addEventListener('touchend', () => {
+                const mouseEvent = new MouseEvent('mouseup', {});
+                canvas.dispatchEvent(mouseEvent);
             });
         }
 
-‏        function isCanvasNotEmpty(canvas) {
-‏            if (!canvas) return false;
-‏            const ctx = canvas.getContext('2d');
-‏            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-‏            const data = imageData.data;
+        function isCanvasNotEmpty(canvas) {
+            if (!canvas) return false;
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
             
-‏            for (let i = 0; i < data.length; i += 4) {
-‏                if (data[i + 3] !== 0) {
-‏                    return true;
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i + 3] !== 0) {
+                    return true;
                 }
             }
-‏            return false;
+            return false;
         }
 
-‏        function clearSignature(type) {
-‏            let canvas, ctx;
+        function clearSignature(type) {
+            let canvas, ctx;
             
-‏            if (type === 'user') {
-‏                canvas = userSignatureCanvas;
-‏                ctx = userSignatureCtx;
-‏            } else if (type === 'employee') {
-‏                canvas = employeeSignatureCanvas;
-‏                ctx = employeeSignatureCtx;
-‏            } else if (type === 'modal') {
-‏                canvas = modalSignatureCanvas;
-‏                ctx = modalSignatureCtx;
+            if (type === 'user') {
+                canvas = userSignatureCanvas;
+                ctx = userSignatureCtx;
+            } else if (type === 'employee') {
+                canvas = employeeSignatureCanvas;
+                ctx = employeeSignatureCtx;
+            } else if (type === 'modal') {
+                canvas = modalSignatureCanvas;
+                ctx = modalSignatureCtx;
             }
             
-‏            if (canvas && ctx) {
-‏                ctx.fillStyle = 'white';
-‏                ctx.fillRect(0, 0, canvas.width, canvas.height);
-‏                ctx.beginPath();
+            if (canvas && ctx) {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
             }
         }
 
-‏        function getSignatureData(type) {
-‏            let canvas;
-‏            if (type === 'user') canvas = userSignatureCanvas;
-‏            else if (type === 'employee') canvas = employeeSignatureCanvas;
+        function getSignatureData(type) {
+            let canvas;
+            if (type === 'user') canvas = userSignatureCanvas;
+            else if (type === 'employee') canvas = employeeSignatureCanvas;
             
-‏            return canvas && isCanvasNotEmpty(canvas) ? canvas.toDataURL() : '';
+            return canvas && isCanvasNotEmpty(canvas) ? canvas.toDataURL() : '';
         }
 
-‏        function openSignatureModal(type, id, empIndex = null) {
-‏            currentSignatureType = type;
-‏            currentSignatureId = id;
-‏            currentEmpIndex = empIndex;
+        function openSignatureModal(type, id, empIndex = null) {
+            currentSignatureType = type;
+            currentSignatureId = id;
+            currentEmpIndex = empIndex;
             
-‏            clearSignature('modal');
+            clearSignature('modal');
             
-‏            if (type === 'user') {
-‏                const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
-‏                const user = users.find(u => u.id === id);
-‏                document.getElementById('signature-modal-title').innerText = `توقيع المستخدم: ${user.name}`;
-‏            } else if (type === 'employee') {
-‏                const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
-‏                const site = sites.find(s => s.id === id);
-‏                const emp = site.employees[empIndex];
-‏                document.getElementById('signature-modal-title').innerText = `توقيع الموظف: ${emp.name}`;
+            if (type === 'user') {
+                const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
+                const user = users.find(u => u.id === id);
+                document.getElementById('signature-modal-title').innerText = `توقيع المستخدم: ${user.name}`;
+            } else if (type === 'employee') {
+                const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+                const site = sites.find(s => s.id === id);
+                const emp = site.employees[empIndex];
+                document.getElementById('signature-modal-title').innerText = `توقيع الموظف: ${emp.name}`;
             }
             
-‏            document.getElementById('signature-modal').style.display = 'flex';
+            document.getElementById('signature-modal').style.display = 'flex';
         }
 
-‏        function closeSignatureModal() {
-‏            document.getElementById('signature-modal').style.display = 'none';
+        function closeSignatureModal() {
+            document.getElementById('signature-modal').style.display = 'none';
         }
 
-‏        function saveSignature() {
-‏            if (!modalSignatureCanvas) return;
+        function saveSignature() {
+            if (!modalSignatureCanvas) return;
 
-‏            const signatureData = modalSignatureCanvas.toDataURL();
+            const signatureData = modalSignatureCanvas.toDataURL();
             
-‏            if (currentSignatureType === 'user') {
-‏                const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
-‏                const userIndex = users.findIndex(u => u.id === currentSignatureId);
-‏                if (userIndex !== -1) {
-‏                    users[userIndex].signature = signatureData;
-‏                    localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
-‏                    showToast('تم حفظ توقيع المستخدم بنجاح', 'success');
-‏                    loadSettingsView();
+            if (currentSignatureType === 'user') {
+                const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS));
+                const userIndex = users.findIndex(u => u.id === currentSignatureId);
+                if (userIndex !== -1) {
+                    users[userIndex].signature = signatureData;
+                    localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+                    showToast('تم حفظ توقيع المستخدم بنجاح', 'success');
+                    loadSettingsView();
                 }
-‏            } else if (currentSignatureType === 'employee') {
-‏                const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
-‏                const siteIndex = sites.findIndex(s => s.id === currentSignatureId);
-‏                if (siteIndex !== -1) {
-‏                    sites[siteIndex].employees[currentEmpIndex].signature = signatureData;
-‏                    localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
-‏                    showToast('تم حفظ توقيع الموظف بنجاح', 'success');
-‏                    loadAttendanceTable();
-‏                    loadSiteEmployees();
+            } else if (currentSignatureType === 'employee') {
+                const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+                const siteIndex = sites.findIndex(s => s.id === currentSignatureId);
+                if (siteIndex !== -1) {
+                    sites[siteIndex].employees[currentEmpIndex].signature = signatureData;
+                    localStorage.setItem(DB_KEYS.SITES, JSON.stringify(sites));
+                    showToast('تم حفظ توقيع الموظف بنجاح', 'success');
+                    loadAttendanceTable();
+                    loadSiteEmployees();
                 }
             }
             
-‏            closeSignatureModal();
+            closeSignatureModal();
+        }
+
+        // === تصدير PDF ===
+        function exportToPDF() {
+            const siteId = document.getElementById('site-select').value;
+            const monthVal = document.getElementById('month-picker').value;
+            
+            if (!siteId || !monthVal) {
+                showToast('الرجاء اختيار الموقع والشهر أولاً', 'error');
+                return;
+            }
+
+            const sites = JSON.parse(localStorage.getItem(DB_KEYS.SITES));
+            const site = sites.find(s => s.id == siteId);
+            const settings = JSON.parse(localStorage.getItem(DB_KEYS.SETTINGS));
+            
+            const pdfTemplate = document.getElementById('pdf-template');
+            pdfTemplate.innerHTML = '';
+
+            const pdfContent = `
+                <div class="pdf-page">
+                    <div class="pdf-header">
+                        <div style="position: relative; height: 120px; display: flex; align-items: center; justify-content: center;">
+                            ${settings.logo ? `<img src="${settings.logo}" style="position: absolute; left: 0; top: 10px; height: 100px; width: 100px; object-fit: contain;">` : ''}
+                            
+                            <h1 style="font-family: 'PT Serif', serif; font-size: 20pt; font-weight: bold; text-align: center; width: 100%; color: #166534;">
+                                شركة الجزيرة الخضراء لتجارة المواشي والأغنام
+                            </h1>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 16pt; font-weight: bold; margin-top: 10px;">
+                            <div style="text-align: right;">التاريخ: <span>${monthVal}</span></div>
+                            <div style="text-align: left;">الموقع: <span>${site.name}</span></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        ${document.getElementById('main-table').outerHTML}
+                    </div>
+
+                    <div class="pdf-footer">
+                        <div style="direction: ltr;">Info@grisland.com</div>
+                        <div style="text-align: center;">0568504018- الشهامة الجديدة - مسلخ الشهامة</div>
+                        <div>صفحة 1 من 1</div>
+                    </div>
+                </div>
+            `;
+
+            pdfTemplate.innerHTML = pdfContent;
+            pdfTemplate.style.display = 'block';
+
+            const opt = {
+                margin: 0.5,
+                filename: `تقرير_${site.name}_${monthVal}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(pdfTemplate).save().then(() => {
+                pdfTemplate.style.display = 'none';
+                showToast('تم تصدير التقرير بنجاح', 'success');
+            });
         }
 
         // === وظائف مساعدة ===
-‏        function getRoleName(role) {
-‏            const roles = {
-‏                'admin': 'مدير النظام',
-‏                'supervisor': 'مشرف الموقع',
-‏                'approver': 'معتمد التقارير',
-‏                'contract_manager': 'مدير العقد'
+        function getRoleName(role) {
+            const roles = {
+                'admin': 'مدير النظام',
+                'supervisor': 'مشرف الموقع',
+                'approver': 'معتمد التقارير',
+                'contract_manager': 'مدير العقد'
             };
-‏            return roles[role] || role;
+            return roles[role] || role;
         }
 
-‏        function loadSidebarData() {
-‏            const settings = JSON.parse(localStorage.getItem(DB_KEYS.SETTINGS));
-‏            const logoImg = document.getElementById('sidebar-logo');
-‏            const noLogo = document.getElementById('no-logo-text');
+        function loadSidebarData() {
+            const settings = JSON.parse(localStorage.getItem(DB_KEYS.SETTINGS));
+            const logoImg = document.getElementById('sidebar-logo');
+            const noLogo = document.getElementById('no-logo-text');
             
-‏            if (settings.logo) {
-‏                logoImg.src = settings.logo;
-‏                logoImg.classList.remove('hidden');
-‏                noLogo.classList.add('hidden');
-‏            } else {
-‏                logoImg.classList.add('hidden');
-‏                noLogo.classList.remove('hidden');
+            if (settings.logo) {
+                logoImg.src = settings.logo;
+                logoImg.classList.remove('hidden');
+                noLogo.classList.add('hidden');
+            } else {
+                logoImg.classList.add('hidden');
+                noLogo.classList.remove('hidden');
             }
         }
 
-‏        function handleLogoUpload(input) {
-‏            const file = input.files[0];
-‏            if (file) {
-‏                const reader = new FileReader();
-‏                reader.onload = function(e) {
-‏                    const settings = JSON.parse(localStorage.getItem(DB_KEYS.SETTINGS));
-‏                    settings.logo = e.target.result;
-‏                    localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(settings));
-‏                    loadSidebarData();
-‏                    showToast('تم تحديث الشعار', 'success');
+        function handleLogoUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const settings = JSON.parse(localStorage.getItem(DB_KEYS.SETTINGS));
+                    settings.logo = e.target.result;
+                    localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(settings));
+                    loadSidebarData();
+                    showToast('تم تحديث الشعار', 'success');
                 };
-‏                reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
             }
         }
 
-‏        function resetSystem() {
-‏            if (confirm('هل أنت متأكد من إعادة ضبط النظام؟ هذا الإجراء سيمسح جميع البيانات ولا يمكن التراجع عنه.')) {
-‏                localStorage.clear();
-‏                location.reload();
+        function resetSystem() {
+            if (confirm('هل أنت متأكد من إعادة ضبط النظام؟ هذا الإجراء سيمسح جميع البيانات ولا يمكن التراجع عنه.')) {
+                localStorage.clear();
+                location.reload();
             }
-        }
-
-‏        function exportToPDF() {
-‏            showToast('خاصية التصدير إلى PDF جاهزة', 'info');
-            // سيتم تنفيذها لاحقاً
         }
 
         // === تهيئة النظام ===
-‏        document.addEventListener('DOMContentLoaded', function() {
-‏            initDB();
+        document.addEventListener('DOMContentLoaded', function() {
+            initDB();
             
             // محاولة استعادة جلسة المستخدم
-‏            const savedUser = localStorage.getItem('currentUser');
-‏            if (savedUser) {
-‏                try {
-‏                    currentUser = JSON.parse(savedUser);
-‏                    document.getElementById('login-overlay').style.display = 'none';
-‏                    document.getElementById('user-display').innerText = `${currentUser.name} (${getRoleName(currentUser.role)})`;
-‏                    document.getElementById('logout-btn').classList.remove('hidden');
-‏                    loadSidebarData();
-‏                    setupUIForRole();
-‏                } catch (e) {
-‏                    console.error('Error restoring user session:', e);
-‏                    localStorage.removeItem('currentUser');
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('user-display').innerText = `${currentUser.name} (${getRoleName(currentUser.role)})`;
+                    document.getElementById('logout-btn').classList.remove('hidden');
+                    loadSidebarData();
+                    setupUIForRole();
+                } catch (e) {
+                    localStorage.removeItem('currentUser');
                 }
             }
 
             // إعداد القائمة الجانبية للجوّال
-‏            document.getElementById('menu-toggle').addEventListener('click', function() {
-‏                document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('menu-toggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('open');
             });
 
             // تعيين التاريخ الحالي افتراضياً
-‏            document.getElementById('month-picker').value = currentMonth;
+            document.getElementById('month-picker').value = currentMonth;
+            document.getElementById('report-month').value = currentMonth;
 
             // تهيئة لوحات التوقيع
-‏            initSignaturePads();
+            initSignaturePads();
         });
 
-‏    </script>
-‏</body>
-‏</html>
+    </script>
+</body>
+</html>
