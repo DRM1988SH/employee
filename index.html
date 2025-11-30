@@ -240,6 +240,21 @@
             max-width: 120px;
             object-fit: contain;
         }
+
+        /* تنسيقات PDF ثابتة */
+        .pdf-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            background: white;
+        }
     </style>
 </head>
 <body>
@@ -477,7 +492,7 @@
     </div>
 
     <div id="pdf-template" style="display: none;">
-        <div style="padding: 20px; direction: rtl; font-family: 'Cairo', sans-serif;">
+        <div style="padding: 20px; direction: rtl; font-family: 'Cairo', sans-serif; position: relative; min-height: 100vh;">
             
             <div style="margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 10px;">
                 <div style="position: relative; height: 120px; display: flex; align-items: center; justify-content: center;">
@@ -514,7 +529,8 @@
 
             </div>
 
-            <div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 10px; display: flex; justify-content: space-between; font-size: 12px; height: 15px;">
+            <!-- فوتر PDF ثابت -->
+            <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 15px; border-top: 1px solid #ccc; padding-top: 10px; display: flex; justify-content: space-between; font-size: 12px; background: white; padding-left: 20px; padding-right: 20px;">
                 <div style="direction: ltr;">Info@grisland.com</div>
                 <div style="text-align: center;">0568504018- الشهامة الجديدة - مسلخ الشهامة</div>
                 <div>صفحة 1-1</div>
@@ -982,23 +998,7 @@
             const getSignature = () => {
                 return new Promise((resolve) => {
                     // التحقق من لوحة التوقيع أولاً
-                    const tempCanvas = document.createElement('canvas');
-                    const tempCtx = tempCanvas.getContext('2d');
-                    tempCanvas.width = employeeSignatureCanvas.width;
-                    tempCanvas.height = employeeSignatureCanvas.height;
-                    tempCtx.drawImage(employeeSignatureCanvas, 0, 0);
-                    
-                    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-                    let isEmpty = true;
-                    
-                    for (let i = 0; i < imageData.data.length; i += 4) {
-                        if (imageData.data[i + 3] !== 0) {
-                            isEmpty = false;
-                            break;
-                        }
-                    }
-                    
-                    if (!isEmpty) {
+                    if (isCanvasNotEmpty(employeeSignatureCanvas)) {
                         resolve(employeeSignatureCanvas.toDataURL());
                         return;
                     }
@@ -1055,23 +1055,7 @@
             const getSignature = () => {
                 return new Promise((resolve) => {
                     // التحقق من لوحة التوقيع أولاً
-                    const tempCanvas = document.createElement('canvas');
-                    const tempCtx = tempCanvas.getContext('2d');
-                    tempCanvas.width = userSignatureCanvas.width;
-                    tempCanvas.height = userSignatureCanvas.height;
-                    tempCtx.drawImage(userSignatureCanvas, 0, 0);
-                    
-                    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-                    let isEmpty = true;
-                    
-                    for (let i = 0; i < imageData.data.length; i += 4) {
-                        if (imageData.data[i + 3] !== 0) {
-                            isEmpty = false;
-                            break;
-                        }
-                    }
-                    
-                    if (!isEmpty) {
+                    if (isCanvasNotEmpty(userSignatureCanvas)) {
                         resolve(userSignatureCanvas.toDataURL());
                         return;
                     }
@@ -1114,6 +1098,19 @@
                 loadSettingsView();
                 showToast('تم حذف المستخدم بنجاح.', 'info');
             }
+        }
+
+        function isCanvasNotEmpty(canvas) {
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i + 3] !== 0) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         function exportToPDF() {
