@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         :root {
             --header-height: 60px;
             --footer-height: 40px;
@@ -117,16 +121,9 @@
             cursor: pointer;
             font-weight: bold;
             color: #374151;
-            -webkit-appearance: none; 
-            -moz-appearance: none;
-            appearance: none;
         }
         .attendance-select:hover {
             background-color: #f0fdf4; 
-        }
-        .attendance-select:focus {
-            outline: 2px solid #22c55e;
-            background-color: #fff;
         }
         
         #login-overlay {
@@ -245,6 +242,31 @@
         .screen.active {
             display: block;
         }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-warning {
+            background: #d97706;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -330,19 +352,19 @@
                     </div>
                     
                     <div class="flex gap-2">
-                        <button onclick="saveAttendance()" id="btn-save" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">
+                        <button onclick="saveAttendance()" id="btn-save" class="btn btn-primary hidden">
                             <i class="fas fa-save"></i> حفظ التقرير
                         </button>
                         
-                        <button onclick="approveReport('supervisor')" id="btn-approve-sup" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 hidden">
+                        <button onclick="approveReport('supervisor')" id="btn-approve-sup" class="btn btn-warning hidden">
                             <i class="fas fa-check"></i> اعتماد مشرف
                         </button>
                         
-                        <button onclick="approveReport('approver')" id="btn-approve-app" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 hidden">
+                        <button onclick="approveReport('approver')" id="btn-approve-app" class="btn btn-success hidden">
                             <i class="fas fa-check-double"></i> اعتماد نهائي
                         </button>
 
-                        <button onclick="exportToPDF()" id="btn-export" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        <button onclick="exportToPDF()" id="btn-export" class="btn btn-danger">
                             <i class="fas fa-file-pdf"></i> تصدير PDF
                         </button>
                     </div>
@@ -384,7 +406,7 @@
                             <input type="month" id="report-month" class="border p-2 rounded bg-gray-50">
                         </div>
                         <div class="flex items-end">
-                            <button onclick="generateReport()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            <button onclick="generateReport()" class="btn btn-success">
                                 <i class="fas fa-chart-bar"></i> إنشاء التقرير
                             </button>
                         </div>
@@ -445,7 +467,7 @@
                 <div class="bg-white p-4 rounded shadow mb-6">
                     <h3 class="font-bold text-lg mb-3 text-red-700">إعادة ضبط النظام</h3>
                     <p class="text-sm text-gray-600 mb-3">هذا الإجراء سيمسح جميع البيانات ويعيد النظام إلى ضبط المصنع.</p>
-                    <button onclick="resetSystem()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+                    <button onclick="resetSystem()" class="btn btn-danger">
                         <i class="fas fa-trash-alt"></i> إعادة ضبط النظام
                     </button>
                 </div>
@@ -475,7 +497,7 @@
                                 </div>
                             </div>
                             
-                            <button onclick="addUser()" class="bg-gray-800 text-white w-full py-2 rounded hover:bg-gray-900 transition">
+                            <button onclick="addUser()" class="btn btn-primary w-full">
                                 إضافة المستخدم
                             </button>
                         </div>
@@ -503,7 +525,7 @@
                         <h3 class="font-bold text-lg mb-3 text-green-700">إدارة المواقع</h3>
                         <div class="flex gap-2 mb-4">
                             <input type="text" id="new-site-name" placeholder="اسم المسلخ" class="border p-2 rounded flex-grow">
-                            <button onclick="addSite()" class="bg-green-600 text-white px-4 py-2 rounded">إضافة موقع</button>
+                            <button onclick="addSite()" class="btn btn-success">إضافة موقع</button>
                         </div>
                         
                         <div class="border-t pt-4">
@@ -529,7 +551,7 @@
                                 </div>
                             </div>
                             
-                            <button onclick="addEmployee()" class="w-full bg-blue-600 text-white py-2 rounded mt-2">
+                            <button onclick="addEmployee()" class="btn btn-primary w-full">
                                 إضافة الموظف
                             </button>
                         </div>
@@ -571,8 +593,8 @@
                 <button type="button" id="clear-modal-signature" class="signature-clear">مسح التوقيع</button>
             </div>
             <div class="flex justify-between">
-                <button onclick="saveSignature()" class="bg-green-600 text-white px-4 py-2 rounded">حفظ التوقيع</button>
-                <button onclick="closeSignatureModal()" class="bg-gray-500 text-white px-4 py-2 rounded">إلغاء</button>
+                <button onclick="saveSignature()" class="btn btn-success">حفظ التوقيع</button>
+                <button onclick="closeSignatureModal()" class="btn btn-danger">إلغاء</button>
             </div>
         </div>
     </div>
@@ -1426,8 +1448,8 @@
             pdfTemplate.innerHTML = '';
 
             const pdfContent = `
-                <div class="pdf-page">
-                    <div class="pdf-header">
+                <div style="padding: 20px; direction: rtl; font-family: 'Cairo', sans-serif;">
+                    <div style="margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 10px;">
                         <div style="position: relative; height: 120px; display: flex; align-items: center; justify-content: center;">
                             ${settings.logo ? `<img src="${settings.logo}" style="position: absolute; left: 0; top: 10px; height: 100px; width: 100px; object-fit: contain;">` : ''}
                             
@@ -1446,7 +1468,19 @@
                         ${document.getElementById('main-table').outerHTML}
                     </div>
 
-                    <div class="pdf-footer">
+                    <div style="margin-top: 50px; display: flex; justify-content: space-around; width: 100%;">
+                        <div style="text-align: center; width: 250px;">
+                            <p style="font-weight: bold; font-size: 16pt; margin-bottom: 15px;">معتمد التقرير</p>
+                            <div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>
+                        </div>
+
+                        <div style="text-align: center; width: 250px;">
+                            <p style="font-weight: bold; font-size: 16pt; margin-bottom: 15px;">مشرف الموقع</p>
+                            <div style="border-bottom: 1px dashed #000; width: 200px; margin-top: 40px;"></div>
+                        </div>
+                    </div>
+
+                    <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 40px; border-top: 1px solid #ccc; padding: 10px 20px; display: flex; justify-content: space-between; font-size: 12px; background: white;">
                         <div style="direction: ltr;">Info@grisland.com</div>
                         <div style="text-align: center;">0568504018- الشهامة الجديدة - مسلخ الشهامة</div>
                         <div>صفحة 1 من 1</div>
